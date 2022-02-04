@@ -1,0 +1,230 @@
+syntax = "proto3";
+
+package Protocol;
+import "google/protobuf/timestamp.proto";
+option csharp_namespace = "Google.Protobuf.Protocol";
+
+enum MsgId {	
+	C_LOGIN = 0x0000;
+	S_LOGIN = 0x0001;
+	C_ROOM_LIST = 0x2002;
+	S_ROOM_LIST = 0x2003;
+	C_PLAYER_LIST = 0x2004;
+	S_PLAYER_LIST = 0x2005;
+	C_PLAYER_INFO = 0x2006;
+	S_PLAYER_INFO = 0x2007;
+	C_MAKE_ROOM = 0x2008;
+	S_MAKE_ROOM = 0x2009;
+	C_ENTER_ROOM = 0x2010;
+	S_ENTER_ROOM = 0x2011;
+	C_LEAVE_LOBBY = 0x2012;
+	S_LEAVE_LOBBY = 0x2013;
+	C_SPAWN = 0x3000;
+	S_SPAWN = 0x3001;
+	C_DESPAWN = 0x3002;
+	S_DESPAWN = 0x3003;
+	C_MOVE = 0x3005;
+	S_MOVE = 0x3006;
+	C_INTERACT = 0x3007;
+	S_INTERACT = 0x3008;
+	S_SYNC = 0x3009;
+	C_LEAVE_ROOM = 0x3010;
+	S_LEAVE_ROOM = 0x3011;
+	C_ROOM_PLAYER_LIST = 0x3012;
+	S_ROOM_PLAYER_LIST = 0x3013;
+}
+
+enum GameObjectType{
+	NONE_OBJECT=0;
+	PLAYER=1;
+	TABLE_OBJECT=2;
+	TABLE_OBJECT_SET=3;
+	PRESET=4;
+}
+
+enum TableObjectEventType{
+	NONE_EVENT=0;
+	OVER=1;
+	SELECT=2;
+	LOCK=3;
+	MERGE=4;
+	PICK=5;
+	SHUFFLE=6;
+}
+
+enum MapType{
+	CIRCLE=0;
+	RECTANGLE=1;
+}
+
+
+message C_Login {
+	string name = 1;
+}
+
+message S_Login{ 
+	bool success = 1;
+}
+
+
+message C_MakeRoom{
+	string name = 1;
+	MapType type = 2;
+	float v1 = 3;
+	float v2 = 4;
+	int32 maxPlayers = 5;
+}
+
+message S_MakeRoom{
+	RoomInfo roomInfo = 1;
+}
+
+message C_RoomList{
+	int32 roomId = 1;
+	string roomKeyword = 2;
+}
+
+message S_RoomList{
+	repeated RoomInfo lobbyRooms = 1;
+	repeated int32 currentPlayerCounts=2;
+}
+
+message C_PlayerList{
+	
+}
+
+message S_PlayerList{
+	repeated P_PlayerProfile playerProfiles = 1;
+}
+
+message C_PlayerInfo{
+
+}
+
+message S_PlayerInfo{
+
+}
+
+message C_EnterRoom{
+	RoomInfo roomInfo = 1;
+}
+
+message S_EnterRoom{
+	RoomInfo roomInfo = 1;
+	ObjectInfo playerInfo = 2;
+	int32 successCode = 3;
+	repeated CColor colors = 5;
+}
+
+message S_LeaveRoom{
+
+}
+
+message C_LeaveLobby{
+
+}
+
+message S_LeaveLobby{
+
+}
+
+message C_Move {
+	repeated int32 objectId =1;
+	repeated Dim3Info pos=2;
+	repeated Dim3Info angle = 3;
+}
+
+message S_Move {
+	repeated int32 objectId = 1;
+	repeated Dim3Info pos=2;
+	repeated Dim3Info angle = 3;
+	bool sync = 4;
+}
+
+message C_Interact {
+	int32 objectId = 1;
+	repeated ObjectEvent events = 2;
+}
+
+message S_Interact{
+	int32 objectId = 1;
+	repeated ObjectEvent events = 2;
+	int32 playerId = 3;
+}
+
+message C_Spawn{
+	
+	string name = 1;
+	Dim3Info pos = 2;
+	Dim3Info angle = 3;
+	GameObjectType objectType = 4;
+}
+
+message S_Spawn{ 
+	repeated ObjectInfo objects = 1; 
+}
+
+message C_Despawn{
+	repeated int32 objectIds = 1;
+}
+
+message S_Despawn{
+	repeated int32 objectIds = 1;
+}
+
+message S_Sync{
+
+}
+
+message C_LeaveRoom{
+
+}
+
+message C_RoomPlayerList{
+	
+}
+
+message S_RoomPlayerList{
+	repeated P_PlayerProfile playerProfiles = 1;
+}
+
+
+message ObjectEvent{
+	TableObjectEventType objectEventId = 1;
+	int32 objectValue = 2;
+	int32 flag =3;
+	repeated int32 shuffleIdx = 4;
+}
+
+message Dim3Info{
+	float x=1;
+	float y=2;
+	float z=3;
+	float distance=4;
+}
+
+message ObjectInfo{
+	int32 objectId = 1;
+	string name = 2;
+	Dim3Info pos = 3;
+	Dim3Info angle = 4;
+	int32 flag = 5;
+}
+
+message RoomInfo{
+	int32 roomId = 1;
+	string name = 2;
+	int32 ownerId = 3;
+	int32 maxPlayers = 4;
+}
+
+message CColor{
+	int32 r = 1;
+	int32 g = 2;
+	int32 b = 3;
+}
+
+message P_PlayerProfile{
+	int32 id = 1;
+	string name = 2;
+}

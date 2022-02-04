@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Server</AssemblyName>
+    <RootNamespace>Server</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="GameRoom.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.17.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ServerCore\ServerCore.csproj" />
+  </ItemGroup>
+
+</Project>
