@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Threading;
 using ServerCore;
 
 namespace Server
@@ -17,15 +19,25 @@ namespace Server
             IPAddress ipAddr = IPAddress.Any;
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
+            // Command
+            CustomCommand cmd = new CustomCommand();
+
+            // Server Setting
             _listener.Init(endPoint, () => { return SessionManager.Instance.Generate(); });
             Logger.Instance.Print("Listening...");
-
             JobTimer.Instance.Push(FlushRoom);
-            
+
             while (true)
             {
                 JobTimer.Instance.Flush();
+
+                if (!cmd.Update())
+                {
+                    break;
+                }
             }
+
+            Logger.Instance.Print("Server Process Terminated");
         }
     } 
 }
