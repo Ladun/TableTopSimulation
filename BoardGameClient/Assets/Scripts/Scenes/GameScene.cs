@@ -123,7 +123,7 @@ public class GameScene : BaseScene
     }
     public void SendPickObject(TableObjectSet to)
     {
-            SendObjectEvent(to.Id, TableObjectEventType.Pick, 0, 1);
+        SendObjectEvent(to.Id, TableObjectEventType.Pick, 0, 1);
     }
     public void SendShuffleObject(TableObject to)
     {

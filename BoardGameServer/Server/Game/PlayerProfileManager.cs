@@ -1,4 +1,5 @@
-﻿using Google.Protobuf.Protocol;
+﻿using Google.Protobuf;
+using Google.Protobuf.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,18 +15,6 @@ namespace Server.Game
 
         // [UNUSED(1)][TYPE(7)][ID(24)]
         int _counter = 1; // TODO
-
-        public PlayerProfile Add()
-        {
-            PlayerProfile profile = new PlayerProfile();
-
-            lock (_lock)
-            {
-                profile.Id = GenerateId();
-                _players.Add(profile.Id, profile);
-            }
-            return profile;
-        }
 
         int GenerateId()
         {
@@ -56,18 +45,22 @@ namespace Server.Game
             return null;
         }
 
-        public void Login(int playerId, string name)
+        public PlayerProfile Login(ClientSession session, string name)
         {
+            PlayerProfile profile = new PlayerProfile();
+            profile.Id = GenerateId();
+            if (string.IsNullOrEmpty(name))
+                name = "Player_" + profile.Id;
+            profile.Name = name;
+            profile.isLogin = true;
+            profile.Session = session;
+
             lock (_lock)
             {
-                PlayerProfile player = Find(playerId);
-                if (player == null)
-                    return;
-                if (string.IsNullOrEmpty(name))
-                    name = "Player_" + playerId;
-                player.Name = name;
-                player.isLogin = true;
+                _players.Add(profile.Id, profile);
             }
+
+            return profile;
         }
 
         public void Logout(int playerId)
@@ -92,6 +85,18 @@ namespace Server.Game
                         playerListPacket.PlayerProfiles.Add(p.GetPacketProfile());
                 }
             }
+        }
+
+        public void Broadcast(IMessage packet)
+        {
+            lock (_lock)
+            {
+                foreach (PlayerProfile _p in _players.Values)
+                {
+                    _p.Session.Send(packet);
+                }
+            }
+
         }
     }
 }

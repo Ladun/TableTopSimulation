@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using static Server.Game.Define;
+using ServerCore;
 
 namespace Server.Game
 {
@@ -116,7 +117,7 @@ namespace Server.Game
 
                     // Remove
                     Player player = objectManager.Remove<Player>(objectId);
-                    Console.WriteLine("Remove Player: " + player);
+                    Logger.Instance.Print("Remove Player: " + player);
                     if (player == null)
                         return;
                        player.Room = null;

@@ -7,6 +7,8 @@ option csharp_namespace = "Google.Protobuf.Protocol";
 enum MsgId {	
 	C_LOGIN = 0x0000;
 	S_LOGIN = 0x0001;
+	C_CHAT = 0x0002;
+	S_CHAT = 0x0003;
 	C_ROOM_LIST = 0x2002;
 	S_ROOM_LIST = 0x2003;
 	C_PLAYER_LIST = 0x2004;
@@ -64,6 +66,14 @@ message C_Login {
 
 message S_Login{ 
 	bool success = 1;
+}
+
+message C_Chat {
+	string chat = 1;
+}
+
+message S_Chat{ 
+	string chat = 1;
 }
 
 

@@ -48,7 +48,7 @@ namespace ServerCore
             }
             else
             {
-                Console.WriteLine($"OnConnectCompleted Fail: {args.SocketError}");
+                Logger.Instance.Print($"OnConnectCompleted Fail: {args.SocketError}");
             }
         }
     }

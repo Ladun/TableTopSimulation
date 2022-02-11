@@ -18,7 +18,7 @@ namespace Server.Game
 
         public P_PlayerProfile GetPacketProfile()
         {
-           P_PlayerProfile p = new P_PlayerProfile();
+            P_PlayerProfile p = new P_PlayerProfile();
             p.Id = Id;
             p.Name = Name;
             return p;

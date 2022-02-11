@@ -14,7 +14,7 @@ namespace Server
 {
     public class ClientSession : PacketSession
     {
-        public PlayerProfile MyPlayer { get; set; }
+        public PlayerProfile Profile { get; set; }
         public int SessionId { get; set; }
 
         public void Send(IMessage packet)
@@ -33,27 +33,26 @@ namespace Server
 
         public override void OnConnected(EndPoint endPoint)
         {
-            Console.WriteLine($"OnConnected: {endPoint}/{SessionId}");
-            MyPlayer = PlayerProfileManager.Instance.Add();
-            {
-                MyPlayer.Name = $"Player_{MyPlayer.Id}";
-                MyPlayer.Session = this;
-            }
-
+            Logger.Instance.Print($"OnConnected: {endPoint}/{SessionId}");
+            //MyPlayer = PlayerProfileManager.Instance.Add();
+            //{
+            //    MyPlayer.Name = $"Player_{MyPlayer.Id}";
+            //    MyPlayer.Session = this;
+            //}
         }
 
         public override void OnDisconnected(EndPoint endPoint)
         {
-            if(MyPlayer.Room != null)
+            if(Profile.Room != null)
             {
-                MyPlayer.Room.LeaveGame(MyPlayer.Id);
+                Profile.Room.LeaveGame(Profile.Id);
             }
 
             SessionManager.Instance.Remove(this);
-            PlayerProfileManager.Instance.Remove(MyPlayer.Id);
+            PlayerProfileManager.Instance.Remove(Profile.Id);
 
 
-            Console.WriteLine($"OnDisconnected: {endPoint}");
+            Logger.Instance.Print($"OnDisconnected: {endPoint}");
         }
 
         public override void OnRecvPacket(ArraySegment<byte> buffer)
@@ -63,7 +62,7 @@ namespace Server
 
         public override void OnSend(int numOfBytes)
         {
-            //Console.WriteLine($"Transferred bytes: {numOfBytes}");
+            //Logger.Instance.Print($"Transferred bytes: {numOfBytes}");
         }
     }
 }

@@ -7,13 +7,11 @@ using Google.Protobuf.Protocol;
 
 public class UIPlayerListContent : UIListContent<P_PlayerProfile>
 {
-    private TextMeshProUGUI playerId;
-    private TextMeshProUGUI playerName;
+    public TextMeshProUGUI playerId;
+    public TextMeshProUGUI playerName;
 
     public override void Init()
     {
-        playerId = transform.Find("PlayerId").GetComponent<TextMeshProUGUI>();
-        playerName = transform.Find("PlayerName").GetComponent<TextMeshProUGUI>();
 
         base.Init();
     }

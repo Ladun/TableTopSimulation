@@ -136,7 +136,6 @@ public class MyPlayer : Player
         // TableObject, Marker Move ===============
         if (rayt)
         {
-
             Vector3 markerPos = (tableObject == null)? tableHit.point + Vector3.up * distanceFromTable : new Vector3(tableHit.point.x, tableObject.transform.position.y + distanceFromTable, tableHit.point.z);
             // Send Marker Move Packet
             AddMovePacketInfo(Id, marker.transform, markerPos, new Vector3(0, Camera.main.transform.eulerAngles.y, 0));
@@ -294,7 +293,7 @@ public class MyPlayer : Player
                         for (int i = 0; i < set.containedObjects.Count && i < preset.transform.childCount; i++)
                         {
                             Transform target = preset.transform.GetChild(i);
-                            TableObject targetTo = set.containedObjects[i];
+                            TableObject targetTo = set.containedObjects[set.containedObjects.Count - 1 - i];
 
                             AddObjectEventPacketInfo(tableObject, TableObjectEventType.Pick, 0);
                             moveInfoList.Add(new MovePacketInfo(targetTo.Id, target.position + Vector3.up * h, target.eulerAngles));

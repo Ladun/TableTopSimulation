@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ServerCore;
 
 namespace Server
 {
-    class SessionManager
+    class SessionManager : Singleton<SessionManager>
     {
-        static SessionManager _session = new SessionManager();
-        public static SessionManager Instance { get { return _session; } }
-
         int _sessionId = 0;
         Dictionary<int, ClientSession> _sessions = new Dictionary<int, ClientSession>();
         object _lock = new object();
@@ -23,7 +21,7 @@ namespace Server
                 session.SessionId = sessionId;
                 _sessions.Add(sessionId, session);
 
-                Console.WriteLine($"Conneted: {sessionId}");
+                Logger.Instance.Print($"Conneted: {sessionId}");
 
                 return session;
             }

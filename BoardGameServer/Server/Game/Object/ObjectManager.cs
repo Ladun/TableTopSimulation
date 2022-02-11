@@ -73,7 +73,6 @@ namespace Server.Game
                     return obj as T;
                 }
             }
-            return null;
         }
 
         public T Find<T>(int objectId) where T: GameObject

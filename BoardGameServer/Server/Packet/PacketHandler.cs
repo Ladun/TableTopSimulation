@@ -11,18 +11,31 @@ using System.Text;
 class PacketHandler
 {
 
+    public static void C_ChatHandler(PacketSession session, IMessage packet)
+    {
+        C_Chat chatPacket = packet as C_Chat;
+        ClientSession clientSession = session as ClientSession;
+
+        S_Chat sChatPacket = new S_Chat();
+        sChatPacket.Chat = clientSession.Profile.Name + ": " + chatPacket.Chat;
+
+        PlayerProfileManager.Instance.Broadcast(sChatPacket);
+
+        Logger.Instance.Print("[Chat]" +sChatPacket.Chat);
+    }
+
     #region Intro Scene
     public static void C_LoginHandler(PacketSession session, IMessage packet)
     {
         C_Login loginPacket = packet as C_Login;
         ClientSession clientSession = session as ClientSession;
 
-        Console.WriteLine("Login: " + clientSession.MyPlayer.Id + "| " + loginPacket.Name);
-        PlayerProfileManager.Instance.Login(clientSession.MyPlayer.Id, loginPacket.Name);
-        // 여기에 로그인 같은거 추가하면 됨
+        clientSession.Profile = PlayerProfileManager.Instance.Login(clientSession, loginPacket.Name);
+        Logger.Instance.Print("Login: " + clientSession.Profile.Id + "| " + clientSession.Profile.Name);
+        // TODO: 여기에 로그인 같은거 추가하면 됨
 
         S_Login sLoginPacket = new S_Login();
-        sLoginPacket.Success = true; // 로그인 여부에 따라서 바꾸면 됨
+        sLoginPacket.Success = true; // TODO: 로그인 여부에 따라서 바꾸면 됨
         clientSession.Send(sLoginPacket);
     }
     #endregion
@@ -33,42 +46,43 @@ class PacketHandler
         C_MakeRoom makeRoomPacket = packet as C_MakeRoom;
         ClientSession clientSession = session as ClientSession;
 
-        int playerId = clientSession.MyPlayer.Id;
+        int playerId = clientSession.Profile.Id;
 
         if (RoomManager.Instance.FindByOwnerId(playerId) != null)
             return;
 
         RoomInfo roomInfo = RoomManager.Instance.Add(playerId, makeRoomPacket.Name, makeRoomPacket.Type, makeRoomPacket.V1, makeRoomPacket.V2, makeRoomPacket.MaxPlayers).GetRoomInfo();
 
-        Console.WriteLine("MakeRoom: " + playerId + "| " + roomInfo.Name );
+        Logger.Instance.Print("MakeRoom: " + playerId + "| " + roomInfo.Name );
 
+        // Send Room maked packet
         S_MakeRoom sMakeRoomPacket = new S_MakeRoom();
         sMakeRoomPacket.RoomInfo = roomInfo;
-
         clientSession.Send(sMakeRoomPacket);
+
     }
     public static void C_RoomListHandler(PacketSession session, IMessage packet)
     {
         C_RoomList roomListPacket = packet as C_RoomList;
         ClientSession clientSession = session as ClientSession;
 
-
         S_RoomList sRoomListPacket = new S_RoomList();
         RoomManager.Instance.GetRoomList(sRoomListPacket, roomListPacket.RoomId, roomListPacket.RoomKeyword);
 
         clientSession.Send(sRoomListPacket);
     }
+
     public static void C_PlayerListHandler(PacketSession session, IMessage packet)
     {
         C_PlayerList playerListPacket = packet as C_PlayerList;
         ClientSession clientSession = session as ClientSession;
 
         S_PlayerList sPlayerListPacket = new S_PlayerList();
-
         PlayerProfileManager.Instance.GetPacketProfiles(sPlayerListPacket);
 
         clientSession.Send(sPlayerListPacket);
     }
+
     public static void C_PlayerInfoHandler(PacketSession session, IMessage packet)
     {
         C_PlayerInfo playerInfoPacket = packet as C_PlayerInfo;
@@ -86,18 +100,18 @@ class PacketHandler
             S_EnterRoom sEnterPacket = new S_EnterRoom();
             sEnterPacket.SuccessCode = 3; // There is no room -> 3
             clientSession.Send(sEnterPacket);
-            Console.WriteLine("No Room!");
+            Logger.Instance.Print("No Room!");
             return;
         }
 
-        room.EnterPlayer(clientSession.MyPlayer);
+        room.EnterPlayer(clientSession.Profile);
     }
     public static void C_LeaveLobbyHandler(PacketSession session, IMessage packet)
     {
         C_LeaveLobby lobbyPacket = packet as C_LeaveLobby;
         ClientSession clientSession = session as ClientSession;
 
-        PlayerProfileManager.Instance.Logout(clientSession.MyPlayer.Id);
+        PlayerProfileManager.Instance.Logout(clientSession.Profile.Id);
 
         S_LeaveLobby sLobbyPacket = new S_LeaveLobby();
         clientSession.Send(sLobbyPacket);
@@ -105,13 +119,12 @@ class PacketHandler
     #endregion
 
     #region Game Scene
-
     public static void C_MoveHandler(PacketSession session, IMessage packet)
     {
         C_Move movePacket = packet as C_Move;
         ClientSession clientSession = session as ClientSession;
 
-        GameRoom room = clientSession.MyPlayer.Room;
+        GameRoom room = clientSession.Profile.Room;
         if (room == null)
             return;
 
@@ -123,7 +136,7 @@ class PacketHandler
         C_Spawn spawnPacket = packet as C_Spawn;
         ClientSession clientSession = session as ClientSession;
 
-        GameRoom room = clientSession.MyPlayer.Room;
+        GameRoom room = clientSession.Profile.Room;
         if (room == null)
             return;
 
@@ -140,13 +153,13 @@ class PacketHandler
         C_Despawn despawnPacket = packet as C_Despawn;
         ClientSession clientSession = session as ClientSession;
 
-        GameRoom room = clientSession.MyPlayer.Room;
+        GameRoom room = clientSession.Profile.Room;
         if (room == null)
             return;
 
         foreach (int objectId in despawnPacket.ObjectIds)
         {
-            Console.WriteLine("Despawn: " + objectId);
+            Logger.Instance.Print("Despawn: " + objectId);
             room.LeaveGame(objectId);
         }
 
@@ -157,11 +170,11 @@ class PacketHandler
         C_Interact interactPacket = packet as C_Interact;
         ClientSession clientSession = session as ClientSession;
 
-        GameRoom room = clientSession.MyPlayer.Room;
+        GameRoom room = clientSession.Profile.Room;
         if (room == null)
             return;
 
-        room.HandleInteract(interactPacket, clientSession.MyPlayer.Id);
+        room.HandleInteract(interactPacket, clientSession.Profile.Id);
 
     }
     public static void C_LeaveRoomHandler(PacketSession session, IMessage packet)
@@ -170,11 +183,11 @@ class PacketHandler
         ClientSession clientSession = session as ClientSession;
 
 
-        GameRoom room = clientSession.MyPlayer.Room;
+        GameRoom room = clientSession.Profile.Room;
         if (room == null)
             return;
 
-            room.LeaveGame(clientSession.MyPlayer.Id);
+            room.LeaveGame(clientSession.Profile.Id);
     }
 
     public static void C_RoomPlayerListHandler(PacketSession session, IMessage packet)
@@ -184,7 +197,7 @@ class PacketHandler
 
         S_RoomPlayerList sPlayerListPacket = new S_RoomPlayerList();
 
-        GameRoom room = clientSession.MyPlayer.Room;
+        GameRoom room = clientSession.Profile.Room;
         if (room == null)
             return;
         room.GetPacketProfiles(sPlayerListPacket);

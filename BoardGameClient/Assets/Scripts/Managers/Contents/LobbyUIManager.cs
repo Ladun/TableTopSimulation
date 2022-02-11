@@ -10,6 +10,7 @@ public class LobbyUIManager : UIManager
 
     public UIListContentsInfo<UIGridListViewer, P_PlayerProfile> playerContent;
     public List<Transform> popupList;
+    public ChatUI chatUI;
 
     private void Update()
     {
@@ -25,6 +26,7 @@ public class LobbyUIManager : UIManager
     {
         playerContent.parent.UpdateItemList(playerContent.prefab, items);
     }
+
     public void InteractPopupItem(string popupName)
     {
         Transform popup = popupList.Find(x => x.name.Equals(popupName));
@@ -52,5 +54,9 @@ public class LobbyUIManager : UIManager
         }
     }
 
+    public void UpdateChatting(S_Chat chat)
+    {
+        chatUI.AddChat(chat.Chat);
+    }
 
 }

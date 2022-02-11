@@ -7,6 +7,14 @@ using TMPro;
 public class IntroScene : BaseScene
 {
 
+    private IntroUIManager uiManager
+    {
+        get
+        {
+            return (IntroUIManager)baseUIManager;
+        }
+    }
+
     public Queue<System.Action> introDelayAction = new Queue<System.Action>();
 
     protected override void Init()
@@ -42,27 +50,27 @@ public class IntroScene : BaseScene
 
     public void FailedToConnect()
     {
-        ((IntroUIManager)baseUIManager).CloseLoading();
+        uiManager.CloseLoading();
     }
 
     #region Send Packet
 
     public void ConnectToServer()
     {
-        string serverIp = ((IntroUIManager)baseUIManager).currentServerIp;
+        string serverIp = uiManager.currentServerIp;
         if (string.IsNullOrEmpty(serverIp))
             return;
 
         if (Managers.Instance.Network.Connect(serverIp))
         {
-            ((IntroUIManager)baseUIManager).OpenLoading("Connect To Server...");
+            uiManager.OpenLoading("Connect To Server...");
         }
     }
 
     public void SendLogin()
     {
         C_Login login = new C_Login();
-        string playerName = ((IntroUIManager)baseUIManager).playerNickName;
+        string playerName = uiManager.playerNickName;
 
         if (string.IsNullOrEmpty(playerName))
             login.Name = "";

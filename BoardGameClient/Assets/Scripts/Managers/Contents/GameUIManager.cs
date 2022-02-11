@@ -103,7 +103,7 @@ public class GameUIManager : UIManager
             return;
         }
 
-        string cDir =curDTS.GetCurrent(curDir.Substring(0, curDir.IndexOf("Resources") + 10));
+        string cDir = curDTS.GetCurrent(curDir.Substring(0, curDir.IndexOf("Resources") + 10));
 
         List<UIObjectListContent.ObjectListStruct> items = new List<UIObjectListContent.ObjectListStruct>();
 

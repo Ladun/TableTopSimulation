@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
+
 namespace ServerCore
 {
     public abstract class PacketSession : Session
@@ -32,7 +33,7 @@ namespace ServerCore
             }
 
             if (packetCount > 1)
-                Console.WriteLine($"패킷 모아보내기 {packetCount}");
+                Logger.Instance.Print($"패킷 모아보내기 {packetCount}");
 
             return processLen;
         }
@@ -134,7 +135,7 @@ namespace ServerCore
             } 
             catch(Exception e)
             {
-                Console.WriteLine($"RegisterSend Failed {e}");
+                Logger.Instance.Print($"RegisterSend Failed {e}");
             }
         }
 
@@ -156,7 +157,7 @@ namespace ServerCore
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"OnSendCompleted Faild {e}");
+                        Logger.Instance.Print($"OnSendCompleted Faild {e}");
                     }
                 }
                 else
@@ -183,7 +184,7 @@ namespace ServerCore
             }
             catch(Exception e)
             {
-                Console.WriteLine($"RegisterRecv Failed {e}");
+                Logger.Instance.Print($"RegisterRecv Failed {e}");
             }
         }
 
@@ -216,12 +217,12 @@ namespace ServerCore
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine($"OnRecvCompleted Faild {e}");
+                    Logger.Instance.Print($"OnRecvCompleted Faild {e}");
                 }
             }
             else
             {
-                Console.WriteLine($"OnRecvCompleted Disconnect {args.BytesTransferred } {args.SocketError} ");
+                Logger.Instance.Print($"OnRecvCompleted Disconnect {args.BytesTransferred } {args.SocketError} ");
                 Disconnect();
             }
         }

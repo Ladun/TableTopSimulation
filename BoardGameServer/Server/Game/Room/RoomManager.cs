@@ -82,7 +82,7 @@ namespace Server.Game
             {
                 foreach(GameRoom room in _rooms.Values)
                 {
-                    //TODO roomId와 roomName에 맞게
+                    //TODO: roomId와 roomName에 맞게
                     roomPacket.LobbyRooms.Add(room.GetRoomInfo());
                     roomPacket.CurrentPlayerCounts.Add(room.CurrentPlayerCount);
                 }

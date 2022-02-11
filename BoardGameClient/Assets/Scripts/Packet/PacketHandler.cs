@@ -8,8 +8,15 @@ using UnityEngine;
 class PacketHandler
 {
 
-    #region Intro Scene
-    public static void S_LoginHandler(PacketSession session, IMessage packet)
+	public static void S_ChatHandler(PacketSession session, IMessage packet)
+	{
+		S_Chat chatPacket = packet as S_Chat;
+
+		Managers.Instance.GetUIManager<LobbyUIManager>().UpdateChatting(chatPacket);
+	}
+
+	#region Intro Scene
+	public static void S_LoginHandler(PacketSession session, IMessage packet)
 	{
 		S_Login loginPacket = packet as S_Login;
 

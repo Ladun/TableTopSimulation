@@ -43,6 +43,7 @@ public class LobbyScene : BaseScene
     {
         Managers.Instance.Scene.LoadScene("Intro", null, null); ;
     }
+
     public void EnterGame(RoomInfo info, ObjectInfo playerInfo, RepeatedField<CColor> colors)
     {
         Managers.Instance.Scene.LoadScene("Game",
@@ -54,6 +55,14 @@ public class LobbyScene : BaseScene
     }
 
     #region Packet Send
+
+    public void SendChat(string text)
+    {
+        C_Chat chat = new C_Chat();
+        chat.Chat = text;
+        Managers.Instance.Network.Send(chat);
+    }
+
     public void SendGoIntro()
     {
         //C_LeaveLobby leaveLobbyPacket = new C_LeaveLobby();
@@ -69,7 +78,6 @@ public class LobbyScene : BaseScene
         roomList.RoomId = roomId;
         roomList.RoomKeyword = roomKeyword;
         Managers.Instance.Network.Send(roomList);
-
     }
 
     public void SendUpdatePlayerList()
