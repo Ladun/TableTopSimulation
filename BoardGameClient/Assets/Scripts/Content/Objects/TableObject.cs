@@ -105,6 +105,8 @@ public class TableObject : MonoBehaviour
             transform.eulerAngles = moveAngle;
         }
 
+        animatedMove = true;
+
     }
 
     public virtual void DoEvent(ObjectEvent e, Player p)

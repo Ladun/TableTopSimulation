@@ -52,6 +52,46 @@ namespace Server.Game
         }
 
         #region Enter/Leave
+
+        public T EnterObject<T>(string name, Dim3Info pos, Dim3Info angle) where T : TableObject, new()
+        {
+            T tableObject = objectManager.Add<T>();
+            tableObject.Info.Pos = pos;
+            tableObject.Info.Angle = angle;
+            tableObject.Room = this;
+            tableObject.Info.Name = name;
+
+            EnterGame(tableObject);
+
+            Logger.Instance.Print($"TableObject Id[{tableObject.Id}] spawned", Logger.LogLevel.DEBUG);
+
+            return tableObject;
+        }
+
+        public void EnterPlayer(PlayerProfile profile)
+        {
+            if (CurrentPlayerCount >= _maxPlayers)
+            {
+
+                S_EnterRoom enterPacket = new S_EnterRoom();
+                enterPacket.SuccessCode = 2; // Room is Full -> 2
+                lock (_lock)
+                {
+                    profile.Session.Send(enterPacket);
+                }
+                return;
+            }
+
+            Player player = objectManager.Add(profile);
+            player.Info.Flag = objectManager.Players.Count - 1;
+            player.Room = this;
+            player.Profile.Room = this;
+            player.Info.Name = profile.Name;
+
+            player.Info.Pos = Vector3.Vector32Dim3(mapInfo.GetPlayerPosition(player.Info.Flag, 3));
+
+            EnterGame(player);
+        }
         public void EnterGame(GameObject gameObject)
         {
             if (gameObject == null)
@@ -215,44 +255,6 @@ namespace Server.Game
                 }
             }
 
-        }
-
-        public T EnterObject<T>(string name, Dim3Info pos, Dim3Info angle) where T : TableObject, new()
-        {
-            T tableObject = objectManager.Add<T>();
-            tableObject.Info.Pos = pos;
-            tableObject.Info.Angle = angle;
-            tableObject.Room = this;
-            tableObject.Info.Name = name;
-
-            EnterGame(tableObject);
-
-            return tableObject;
-        }
-
-        public void EnterPlayer(PlayerProfile profile)
-        {
-            if(CurrentPlayerCount >= _maxPlayers)
-            {
-
-                S_EnterRoom enterPacket = new S_EnterRoom();
-                enterPacket.SuccessCode = 2; // Room is Full -> 2
-                lock (_lock)
-                {
-                    profile.Session.Send(enterPacket);
-                }
-                return;
-            }
-
-            Player player = objectManager.Add(profile);
-            player.Info.Flag = objectManager.Players.Count - 1;
-            player.Room = this;
-            player.Profile.Room = this;
-            player.Info.Name = profile.Name;
-
-            player.Info.Pos = Vector3.Vector32Dim3(mapInfo.GetPlayerPosition(player.Info.Flag, 3));
-
-            EnterGame(player);
         }
 
         #endregion

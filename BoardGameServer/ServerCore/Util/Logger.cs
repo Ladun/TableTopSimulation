@@ -105,7 +105,6 @@ namespace ServerCore
             if (cy == ccy)
             {
                 ccy += 1;
-                Console.WindowTop++;
             }
             PrintCommand(recentCommand);
         }

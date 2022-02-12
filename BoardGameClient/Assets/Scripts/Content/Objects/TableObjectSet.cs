@@ -78,6 +78,7 @@ public class TableObjectSet : TableObject
             Managers.Instance.GetScene<GameScene>().SendDespawnObject(Id);
 
         UpdateItemPosition();
+        outline.UpdateRendererCache();
     }
 
     public void FreeAllObject()
