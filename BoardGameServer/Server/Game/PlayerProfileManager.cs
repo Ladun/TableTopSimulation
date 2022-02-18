@@ -87,6 +87,20 @@ namespace Server.Game
             }
         }
 
+        public List<PlayerProfile> GetProfiles()
+        {
+            List<PlayerProfile> l = new List<PlayerProfile>();
+            lock (_lock)
+            {
+                foreach (PlayerProfile p in _players.Values)
+                {
+                    l.Add(p);
+                }
+            }
+
+            return l;
+        }
+
         public void Broadcast(IMessage packet)
         {
             lock (_lock)

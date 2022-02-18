@@ -25,6 +25,7 @@ namespace Server.Game
         }
 
         string _roomName;
+        public string RoomName { get { return _roomName; } }
         int _maxPlayers;
 
         public ObjectManager objectManager = new ObjectManager();
@@ -290,8 +291,6 @@ namespace Server.Game
 
         public void HandleMove(C_Move packet)
         {
-
-
             S_Move sMovePacket = new S_Move();
             for (int i = 0; i < packet.Pos.Count; i++)
             {

@@ -20,8 +20,8 @@ public class MyPlayer : Player
         }
     }
 
-    private static float lowerPacketSendDist = .1f;
-    private static float lowerPacketSendAngle = 5f;
+    private static float lowerPacketSendDist = 0.005f;
+    private static float lowerPacketSendAngle = 1f;
 
     private static float sendFrequency = 1 / 2f;
     private float sendTime = 0;

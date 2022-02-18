@@ -99,6 +99,44 @@ namespace Server
                 PlayerProfileManager.Instance.Broadcast(sChatPacket);
                 return;
             }
+            else if (components[0].Equals("players"))
+            {
+                List<PlayerProfile> pp = PlayerProfileManager.Instance.GetProfiles();
+                Logger.Instance.Print($"[Player List]=======================================", Logger.LogLevel.DEBUG);
+                for (int i = 0; i < pp.Count; i++)
+                {
+                    Logger.Instance.Print($"Id: {pp[i].Id},\t Name: {pp[i].Name},\t Current Room Id: {(pp[i].Room != null? pp[i].Room.RoomId: 'x')}", Logger.LogLevel.DEBUG);
+                }
+
+                return;
+            }
+            else if (components[0].Equals("rooms"))
+            {
+                if (components.Length == 1)
+                {
+                    List<GameRoom> roomList = RoomManager.Instance.GetRoomList();
+                    Logger.Instance.Print($"[Room List]=======================================", Logger.LogLevel.DEBUG);
+                    for (int i = 0; i < roomList.Count; i++)
+                    {
+                        Logger.Instance.Print($"Id: {roomList[i].RoomId},\t Name: {roomList[i].RoomName}", Logger.LogLevel.DEBUG);
+                    }
+                }
+                else if(components.Length == 2)
+                {
+                    int roomId;
+                    if(int.TryParse(components[1], out roomId))
+                    {
+                        GameRoom gr = RoomManager.Instance.Find(roomId);
+                        Logger.Instance.Print($"[Room Info]Id: {gr.RoomId},\t Name: {gr.RoomName},\tCurrent Player Count: {gr.CurrentPlayerCount}", Logger.LogLevel.DEBUG);
+                        return;
+                    }
+                    else
+                    {
+                        // TODO: set error message
+                    }
+                }
+                return;
+            }
 
             state = State.Failed;
         }

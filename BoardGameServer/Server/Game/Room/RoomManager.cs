@@ -88,6 +88,20 @@ namespace Server.Game
                 }
             }
         }
+        public List<GameRoom> GetRoomList()
+        {
+            List<GameRoom> l = new List<GameRoom>();
+            lock (_lock)
+            {
+                foreach (GameRoom room in _rooms.Values)
+                {
+                    //TODO: roomId와 roomName에 맞게
+                    l.Add(room);
+                }
+            }
+
+            return l;
+        }
 
     }
 }
