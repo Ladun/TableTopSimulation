@@ -12,8 +12,6 @@ public class Test : MonoBehaviour
     private void Start()
     {
         print(Application.dataPath);
-
-        customMesh = new CustomMeshData(Application.dataPath + "/Meshs/Card.obj");
     }
 
     public void OpenFileBrowser()
