@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ContentManager : MonoBehaviour
 {
+    #region Singleton
     private static ContentManager _instance;
     public static ContentManager instance
     {
@@ -17,12 +18,31 @@ public class ContentManager : MonoBehaviour
             return _instance;
         }
     }
+    #endregion
 
-    private List<CustomMeshData> meshes = new List<CustomMeshData>();
+    private List<CustomData> _data = new List<CustomData>();
+    public List<CustomData> data
+    {
+        get { return _data; }
+    }
+
+    private int activeDataIdx;
 
     public void AddObj(string path)
     {
-        CustomMeshData cmm = new CustomMeshData(path);
-        meshes.Add(cmm);
+        CustomData cmm = new CustomData(path);
+        _data.Add(cmm);
+
+        ActiveData(_data.Count - 1);
+    }
+
+    public void ActiveData(int idx)
+    {
+        for(int i = 0; i <_data.Count; i++)
+        {
+            _data[i].go.SetActive(false);
+        }
+
+        _data[idx].go.SetActive(true);
     }
 }

@@ -13,7 +13,7 @@ public class CustomFileBrowser : MonoBehaviour
     public TMP_InputField currentPathText;
     public TMP_InputField findFilter;
     public Transform contentParent;
-    private List<FileBrowserContent> contents;
+    private List<FileBrowserContent> contents = new List<FileBrowserContent>();
 
     [Header("Directory Options")]
     public Color directoryTextColor;
@@ -75,9 +75,9 @@ public class CustomFileBrowser : MonoBehaviour
     private FileBrowserContent GetContentObject(int idx)
     {
         FileBrowserContent content;
-        if (idx < contentParent.childCount)
+        if (idx < contents.Count)
         {
-            content = contentParent.GetChild(idx).GetComponent<FileBrowserContent>();
+            content = contents[idx];
         }
         else
         {
@@ -96,10 +96,12 @@ public class CustomFileBrowser : MonoBehaviour
                     if (fb.originPath.EndsWith(".obj"))
                     {
                         ContentManager.instance.AddObj(fb.originPath);
+                        UIManager.instance.UpdateContentBrowser();
                     }
                 }
 
             };
+            contents.Add(content);
         }
         return content;
     }

@@ -4,15 +4,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
 
-public class CustomMeshData 
+public class CustomData 
 {
-    private Mesh mesh;
+    public GameObject go;
 
-    public CustomMeshData(string objPath)
+    public CustomData(string objPath)
     {
-        mesh = new Mesh();
         OBJLoader loader = new OBJLoader();
-        GameObject go = loader.Load(objPath);
+        go = loader.Load(objPath);
 
         //Icon appIcon = Icon.ExtractAssociatedIcon();
     }

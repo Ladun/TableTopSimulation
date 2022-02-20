@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class Test : MonoBehaviour
 {
 
-    private CustomMeshData customMesh;
+    private CustomData customMesh;
 
     private void Start()
     {
