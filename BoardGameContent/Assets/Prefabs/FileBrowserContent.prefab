@@ -96,6 +96,8 @@ MonoBehaviour:
   downColor: {r: 0.22745098, g: 0.38039216, b: 0.6627451, a: 0.25490198}
   originPath: 
   lastPath: 
+  selectedColor: {r: 0.3176471, g: 0.4357637, b: 1, a: 0.25490198}
+  selected: 0
 --- !u!1 &7772977060418970758
 GameObject:
   m_ObjectHideFlags: 0

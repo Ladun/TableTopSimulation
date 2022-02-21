@@ -14,6 +14,7 @@ public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public System.Action<CustomButton> onClick;
 
+
     private void Awake()
     {
         graphic.color = normalColor;
@@ -21,8 +22,9 @@ public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if(onClick != null)
+        if (onClick != null)
             onClick.Invoke(this);
+
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -37,11 +39,16 @@ public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        graphic.color = normalColor;
+        graphic.color = GetNormalColor();
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         graphic.color = overColor;
+    }
+
+    protected virtual Color GetNormalColor()
+    {
+        return normalColor;
     }
 }

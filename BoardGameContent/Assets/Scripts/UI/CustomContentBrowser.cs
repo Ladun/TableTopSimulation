@@ -56,4 +56,17 @@ public class CustomContentBrowser : MonoBehaviour
         }
         contents[idx].Active();
     }
+
+    // Reference: ContentBrowser -> Close Button
+    public void OpenClose()
+    {
+        if (gameObject.activeSelf)
+        {
+            gameObject.SetActive(false);
+        }
+        else
+        {
+            gameObject.SetActive(true);
+        }
+    }
 }

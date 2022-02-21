@@ -40,9 +40,9 @@ public class ContentManager : MonoBehaviour
     {
         for(int i = 0; i <_data.Count; i++)
         {
-            _data[i].go.SetActive(false);
+            _data[i].meshRenderer.gameObject.SetActive(false);
         }
 
-        _data[idx].go.SetActive(true);
+        _data[idx].meshRenderer.gameObject.SetActive(true);
     }
 }

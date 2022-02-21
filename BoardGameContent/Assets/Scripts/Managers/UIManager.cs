@@ -26,4 +26,20 @@ public class UIManager : MonoBehaviour
     {
         contentBrowser.UpdateBrowser();
     }
+
+    public void OpenObjFileBrowser()
+    {
+        fileBrowser.Open(@"[\w]*\.obj$", (path) =>
+        {
+            ContentManager.instance.AddObj(path);
+            contentBrowser.UpdateBrowser();
+        });
+    }
+    public void OpenTextureFileBrowser(ContentBrowserContent cbc)
+    {
+        fileBrowser.Open(@"[\w]*\.(png|jpg|jpeg)$", (path) =>
+        {
+            cbc.LoadTexture(path);
+        });
+    }
 }

@@ -10,8 +10,16 @@ public class FileBrowserContent : CustomButton
     public string originPath;
     public string lastPath;
 
+    public Color selectedColor;
+    public bool selected;
+
     public void Setting(string path, string displayPath=null)
     {
+        // Custom Button setting
+        selected = false;
+        graphic.color = normalColor;
+
+        // FileBrowserContent Setting
         originPath = path;
         if (string.IsNullOrEmpty(displayPath))
         {
@@ -24,5 +32,12 @@ public class FileBrowserContent : CustomButton
         }
 
         transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = lastPath;
+    }
+
+    protected override Color GetNormalColor()
+    {
+        if (selected)
+            return selectedColor;
+        return normalColor;
     }
 }

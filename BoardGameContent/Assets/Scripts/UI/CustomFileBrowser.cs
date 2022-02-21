@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 
 public class CustomFileBrowser : MonoBehaviour
 {
+
     [Header("Default Components")]
     public FileBrowserContent contentPrefab;
     public TMP_InputField currentPathText;
@@ -18,10 +19,17 @@ public class CustomFileBrowser : MonoBehaviour
     [Header("Directory Options")]
     public Color directoryTextColor;
 
+    // Selection
+    private List<FileBrowserContent> selected = new List<FileBrowserContent>();
+    private System.Action<string> _selectedAction;
+    private Regex baseRegex;
+
     private void Start()
     {
         gameObject.SetActive(false);
         SetPath(Application.dataPath);
+        baseRegex = null;
+        _selectedAction = null;
     }
     
     // Reference: FileBrowser -> CurrentPath -> Home
@@ -62,6 +70,10 @@ public class CustomFileBrowser : MonoBehaviour
     {
         for (int i = 0; i < paths.Length; i++)
         {
+            if (!File.GetAttributes(paths[i]).HasFlag(FileAttributes.Directory) &&
+                baseRegex != null && !baseRegex.IsMatch(paths[i]))
+                continue;
+
             if (!string.IsNullOrEmpty(findFilter.text) && !reg.IsMatch(paths[i]))
                 continue;
 
@@ -86,6 +98,7 @@ public class CustomFileBrowser : MonoBehaviour
             content.onClick = (CustomButton b) =>
             {
                 FileBrowserContent fb = b as FileBrowserContent;
+                fb.selected = !fb.selected;
 
                 if (File.GetAttributes(fb.originPath).HasFlag(FileAttributes.Directory))
                 {
@@ -93,10 +106,13 @@ public class CustomFileBrowser : MonoBehaviour
                 }
                 else
                 {
-                    if (fb.originPath.EndsWith(".obj"))
+                    if (fb.selected)
                     {
-                        ContentManager.instance.AddObj(fb.originPath);
-                        UIManager.instance.UpdateContentBrowser();
+                        selected.Add(fb);
+                    }
+                    else
+                    {
+                        selected.Remove(fb);
                     }
                 }
 
@@ -106,19 +122,37 @@ public class CustomFileBrowser : MonoBehaviour
         return content;
     }
 
-
-    // Reference: OpenFileBrowser
-    public void OpenClose()
+    public void Open(string filter, System.Action<string> selectedAction)
     {
-        if (gameObject.activeSelf)
+        _selectedAction = selectedAction;
+        baseRegex = new Regex(filter);
+
+        gameObject.SetActive(true);
+        UpdateFileBrowser();
+    }
+
+    public void Close()
+    {
+        baseRegex = null;
+        _selectedAction = null;
+        selected.Clear();
+        gameObject.SetActive(false);
+    }
+
+    public void Selected()
+    {
+        baseRegex = null;
+        if (_selectedAction != null)
         {
-            gameObject.SetActive(false);
+            for(int i = 0; i < selected.Count; i++)
+            {
+                _selectedAction.Invoke(selected[i].originPath);
+            }
         }
-        else
-        {
-            gameObject.SetActive(true);
-            UpdateFileBrowser();
-        }
+        _selectedAction = null;
+        selected.Clear();
+
+        gameObject.SetActive(false);
     }
 
 }

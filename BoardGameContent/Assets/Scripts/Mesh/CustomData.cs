@@ -6,13 +6,20 @@ using UnityEngine;
 
 public class CustomData 
 {
-    public GameObject go;
+    public MeshRenderer meshRenderer;
 
     public CustomData(string objPath)
     {
         OBJLoader loader = new OBJLoader();
-        go = loader.Load(objPath);
+        GameObject go = loader.Load(objPath);
+        meshRenderer = go.GetComponentInChildren<MeshRenderer>();
+
 
         //Icon appIcon = Icon.ExtractAssociatedIcon();
+    }
+
+    public Texture GetTexture()
+    {
+        return meshRenderer.material.mainTexture;
     }
 }
