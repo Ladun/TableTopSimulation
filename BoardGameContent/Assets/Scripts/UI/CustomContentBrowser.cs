@@ -39,7 +39,6 @@ public class CustomContentBrowser : MonoBehaviour
             content.transform.SetParent(contentParent); 
             content.onClick = (CustomButton b) =>
             {
-                print(idx);
                 UIManager.instance.contentBrowser.ActiveData(idx);
                 ContentManager.instance.ActiveData(idx);
             };

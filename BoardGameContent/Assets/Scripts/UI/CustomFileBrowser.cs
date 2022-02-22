@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 
 public class CustomFileBrowser : MonoBehaviour
 {
+    public enum SelectType { File, Directory }
 
     [Header("Default Components")]
     public FileBrowserContent contentPrefab;
@@ -22,16 +23,25 @@ public class CustomFileBrowser : MonoBehaviour
     // Selection
     private List<FileBrowserContent> selected = new List<FileBrowserContent>();
     private System.Action<string> _selectedAction;
-    private Regex baseRegex;
+    private System.Func<string, bool> _filter;
+    private SelectType _selectType;
 
     private void Start()
     {
         gameObject.SetActive(false);
-        SetPath(Application.dataPath);
-        baseRegex = null;
-        _selectedAction = null;
+        ValueClear();
+
+        SetPathToHome();
     }
-    
+
+    private void ValueClear()
+    {
+        _filter = null;
+        _selectedAction = null;
+        selected.Clear();
+        _selectType = SelectType.File;
+    }
+
     // Reference: FileBrowser -> CurrentPath -> Home
     public void SetPathToHome()
     {
@@ -71,7 +81,7 @@ public class CustomFileBrowser : MonoBehaviour
         for (int i = 0; i < paths.Length; i++)
         {
             if (!File.GetAttributes(paths[i]).HasFlag(FileAttributes.Directory) &&
-                baseRegex != null && !baseRegex.IsMatch(paths[i]))
+                _filter != null && !_filter.Invoke(paths[i]))
                 continue;
 
             if (!string.IsNullOrEmpty(findFilter.text) && !reg.IsMatch(paths[i]))
@@ -122,10 +132,11 @@ public class CustomFileBrowser : MonoBehaviour
         return content;
     }
 
-    public void Open(string filter, System.Action<string> selectedAction)
+    public void Open(System.Func<string, bool> filter, System.Action<string> selectedAction, SelectType selectType=SelectType.File)
     {
         _selectedAction = selectedAction;
-        baseRegex = new Regex(filter);
+        _filter = filter;
+        _selectType = selectType;
 
         gameObject.SetActive(true);
         UpdateFileBrowser();
@@ -133,26 +144,29 @@ public class CustomFileBrowser : MonoBehaviour
 
     public void Close()
     {
-        baseRegex = null;
-        _selectedAction = null;
-        selected.Clear();
+        ValueClear();
         gameObject.SetActive(false);
     }
 
     public void Selected()
     {
-        baseRegex = null;
         if (_selectedAction != null)
         {
-            for(int i = 0; i < selected.Count; i++)
+            if (_selectType == SelectType.File)
             {
-                _selectedAction.Invoke(selected[i].originPath);
+                for (int i = 0; i < selected.Count; i++)
+                {
+                    _selectedAction.Invoke(selected[i].originPath);
+                }
+            }
+            else
+            {
+                _selectedAction.Invoke(currentPathText.text);
             }
         }
-        _selectedAction = null;
-        selected.Clear();
-
+        ValueClear();
         gameObject.SetActive(false);
     }
+
 
 }

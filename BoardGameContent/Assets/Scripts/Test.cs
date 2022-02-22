@@ -1,4 +1,5 @@
 using System.Collections;
+using System.IO;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -11,7 +12,6 @@ public class Test : MonoBehaviour
 
     private void Start()
     {
-        print(Application.dataPath);
     }
 
     public void OpenFileBrowser()

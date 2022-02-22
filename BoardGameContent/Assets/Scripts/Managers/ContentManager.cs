@@ -28,21 +28,32 @@ public class ContentManager : MonoBehaviour
 
     private int activeDataIdx;
 
-    public void AddObj(string path)
+    public CustomData AddObj(string path)
     {
         CustomData cmm = new CustomData(path);
         _data.Add(cmm);
 
         ActiveData(_data.Count - 1);
+
+        return cmm;
     }
 
     public void ActiveData(int idx)
     {
-        for(int i = 0; i <_data.Count; i++)
+        activeDataIdx = idx;
+        for (int i = 0; i <_data.Count; i++)
         {
-            _data[i].meshRenderer.gameObject.SetActive(false);
+            _data[i].go.SetActive(false);
         }
+        _data[idx].go.SetActive(true);
+    }
 
-        _data[idx].meshRenderer.gameObject.SetActive(true);
+    public void Clear()
+    {
+        for (int i = 0; i < _data.Count; i++)
+        {
+            Destroy(_data[i].go);
+        }
+        _data.Clear();
     }
 }

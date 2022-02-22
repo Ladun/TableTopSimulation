@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Networking;
 
 public class ContentBrowserContent : CustomButton
 {
@@ -12,7 +13,6 @@ public class ContentBrowserContent : CustomButton
 
     // Detail
     public TMP_InputField nameText2;
-    public TextMeshProUGUI matTextureName;
     public Image matTexture;
     public CustomData md;
 
@@ -28,41 +28,34 @@ public class ContentBrowserContent : CustomButton
     {
         md = customMeshData;
 
-        Texture2D texture = md.GetTexture() as Texture2D;
-        if(texture != null)
-            SetTexture(texture);
-        SetText(md.meshRenderer.name);
-    }
-
-    public void LoadTexture(string path)
-    {
-        StartCoroutine(CoLoadTexture(path));
-    }
-
-    IEnumerator CoLoadTexture(string path)
-    {
-        // Start a download of the given URL
-        using (WWW www = new WWW(path))
+        SetText(md.go.name);
+        for (int i = 0; i < md.meshRenderers.Length; i++)
         {
-            // Wait for download to complete
-            yield return www;
-
-            // assign texture
-            md.meshRenderer.material.mainTexture = www.texture;
-            SetTexture(www.texture);
+            // TODO: meshRenderer가 1개 이상일 때 UI에 이미지 추가하기
+            Texture2D texture = md.GetTexture(i) as Texture2D;
+            if (texture != null)
+                SetTexture(texture);
         }
+    }
+
+    public void LoadTexture(int idx, string path)
+    {
+        StartCoroutine(Utils.CoLoadTexture(path, (texture) =>
+        {
+            md.SetTexture(idx, texture);
+            SetTexture(texture);
+        }));
     }
 
     public void SetTexture(Texture2D tex)
     {
         Rect rect = new Rect(0, 0, tex.width, tex.height);
         matTexture.sprite = Sprite.Create(tex, rect, new Vector2(0.5f, 0.5f));
-        matTextureName.text = tex.name;
     }
 
     public void NameChanged(string text)
     {
-        md.meshRenderer.name = text;
+        md.go.name = text;
         SetText(text);
     }
 
