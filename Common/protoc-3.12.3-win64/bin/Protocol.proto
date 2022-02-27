@@ -9,6 +9,8 @@ enum MsgId {
 	S_LOGIN = 0x0001;
 	C_CHAT = 0x0002;
 	S_CHAT = 0x0003;
+	C_FILE_TRANSFER = 0x0004;
+	S_FILE_TRANSFER = 0x0005;
 	C_ROOM_LIST = 0x2002;
 	S_ROOM_LIST = 0x2003;
 	C_PLAYER_LIST = 0x2004;
@@ -21,7 +23,7 @@ enum MsgId {
 	S_ENTER_ROOM = 0x2011;
 	C_LEAVE_LOBBY = 0x2012;
 	S_LEAVE_LOBBY = 0x2013;
-	C_SPAWN = 0x3000;
+	C_SPAWN = 0x3000;  
 	S_SPAWN = 0x3001;
 	C_DESPAWN = 0x3002;
 	S_DESPAWN = 0x3003;
@@ -59,7 +61,6 @@ enum MapType{
 	RECTANGLE=1;
 }
 
-
 message C_Login {
 	string name = 1;
 }
@@ -76,6 +77,17 @@ message S_Chat{
 	string chat = 1;
 }
 
+message C_FileTransfer {
+	int32 sendCode = 1; 
+	string name = 2;
+	bytes filebytes = 3;
+}
+
+message S_FileTransfer{ 
+	int32 sendCode = 1;
+	string name = 2;
+	bytes filebytes = 3;
+}
 
 message C_MakeRoom{
 	string name = 1;
@@ -83,6 +95,7 @@ message C_MakeRoom{
 	float v1 = 3;
 	float v2 = 4;
 	int32 maxPlayers = 5;
+	repeated string pacakgeCodes = 6;
 }
 
 message S_MakeRoom{

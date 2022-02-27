@@ -71,6 +71,15 @@ public class Utils
         return dts;
     }
 
+    public static byte[] LoadFile(string path)
+    {
+        FileStream fileStream = new FileStream(path, FileMode.Open);
+        byte[] data = new byte[fileStream.Length];
+        fileStream.Read(data, 0, data.Length);
+        fileStream.Close();
+        return data;
+    }
+
     public static string GetNameFromPath(string path)
     {
         string name = path;

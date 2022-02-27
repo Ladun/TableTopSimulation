@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading;
 using ServerCore;
+using System.IO;
 
 namespace Server
 {
@@ -21,6 +22,8 @@ namespace Server
 
             // Command
             CustomCommand cmd = new CustomCommand();
+
+            PackageManager.Instance.GetHashCode();
 
             // Server Setting
             _listener.Init(endPoint, () => { return SessionManager.Instance.Generate(); });

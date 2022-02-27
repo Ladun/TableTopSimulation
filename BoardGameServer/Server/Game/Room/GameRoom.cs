@@ -31,7 +31,8 @@ namespace Server.Game
         public ObjectManager objectManager = new ObjectManager();
         MapInfo mapInfo;
 
-        List<CColor> colors = new List<CColor>();
+        private List<CColor> colors = new List<CColor>();
+        private List<string> packageCodes = new List<string>();
 
         public GameRoom(int ownerId, string roomName, MapType mapType, float v1, float v2, int maxPlayers)
         {

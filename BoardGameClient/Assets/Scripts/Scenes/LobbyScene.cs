@@ -55,6 +55,13 @@ public class LobbyScene : BaseScene
     }
 
     #region Packet Send
+    public void SendFile()
+    {
+        C_FileTransfer fileTransfer = new C_FileTransfer();
+        fileTransfer.SendCode = 0;
+        fileTransfer.Name = "Card.obj";
+        Managers.Instance.Network.Send(fileTransfer);
+    }
 
     public void SendChat(string text)
     {
@@ -94,6 +101,12 @@ public class LobbyScene : BaseScene
         makeRoomPacket.MaxPlayers = rmpp.GetMaxPlayers();
         makeRoomPacket.Type = MapType.Circle;
         makeRoomPacket.V1 = 10;
+        List<string> codes = rmpp.GetPackageCodes();
+        for(int i = 0; i < codes.Count; i++)
+        {
+            makeRoomPacket.PacakgeCodes.Add(codes[i]);
+        }
+
         Managers.Instance.Network.Send(makeRoomPacket);
 
         Managers.Instance.GetUIManager<LobbyUIManager>().OpenLoading("Waiting For Make Room...");

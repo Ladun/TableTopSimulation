@@ -24,19 +24,39 @@ public class StoreManager : MonoBehaviour
     [System.Serializable]
     public class StoreData
     {
+        public string packageName;
+        public string packageVersion;
+        public ObjData[] objData;
+    }
+
+    [System.Serializable]
+    public class ObjData
+    {
         public string objName;
         public string name;
         public string[] textures;
     }
 
-    public void Save(string targetDir)
+    public void Save(string packageName, string packageVersion, string targetDir)
     {
-        StartCoroutine("CoSave", targetDir);
+        StartCoroutine(CoSave( packageName, packageVersion, targetDir));
     }
 
-    private IEnumerator CoSave(string targetDir)
+    private IEnumerator CoSave(string packageName, string packageVersion, string targetDir)
     {
-        StoreData[] storeData = new StoreData[ContentManager.instance.data.Count];
+        string packageDir = Path.Combine(targetDir, $"{packageName}{packageVersion}");
+        if (!Directory.Exists(packageDir))
+        {
+            Directory.CreateDirectory(packageDir);
+        }
+
+        // Define store data
+        StoreData storeData = new StoreData();
+        storeData.packageName = packageName;
+        storeData.packageVersion = packageVersion;
+
+        // Construct object data ----
+        ObjData[] objData = new ObjData[ContentManager.instance.data.Count];
         HashSet<string> objSet = new HashSet<string>();
 
         for (int i = 0; i < ContentManager.instance.data.Count; i++)
@@ -44,7 +64,7 @@ public class StoreManager : MonoBehaviour
             CustomData data = ContentManager.instance.data[i];
             objSet.Add(data.path);
 
-            StoreData d = new StoreData();
+            ObjData d = new ObjData();
             d.objName = Path.GetFileName(data.path);
             d.name = data.go.name;
             d.textures = new string[data.meshRenderers.Length];
@@ -54,22 +74,25 @@ public class StoreManager : MonoBehaviour
 
                 // Save Textures
                 byte[] _bytes = ((Texture2D)data.meshRenderers[j].material.mainTexture).EncodeToPNG();
-                SaveFile(Path.Combine(targetDir, d.textures[j]), _bytes);
+                SaveFile(Path.Combine(packageDir, d.textures[j]), _bytes);
             }
-            storeData[i] = d;
+            objData[i] = d;
         }
 
         foreach(string path in objSet)
         {
             // Save objs
-            File.Copy(path, Path.Combine(targetDir, Path.GetFileName(path)), true);
+            File.Copy(path, Path.Combine(packageDir, Path.GetFileName(path)), true);
         }
 
-        string jsonFile = JsonHelper.ToJson(storeData);
-        SaveFile(Path.Combine(targetDir, "package.json"), Encoding.UTF8.GetBytes(jsonFile));
+        storeData.objData = objData;
+
+        string jsonFile = JsonUtility.ToJson(storeData);
+        SaveFile(Path.Combine(packageDir, "package.json"), Encoding.UTF8.GetBytes(jsonFile));
 
         yield return null;
     }
+
     public void Load(string jsonFilePath)
     {
         StartCoroutine("CoLoad", jsonFilePath);
@@ -82,11 +105,11 @@ public class StoreManager : MonoBehaviour
         string targetDir = Path.GetDirectoryName(jsonFilePath);
 
         byte[] bytes = LoadFile(jsonFilePath);
-        StoreData[] storeData = JsonHelper.FromJson<StoreData>(Encoding.UTF8.GetString(bytes));
+        StoreData storeData = JsonUtility.FromJson<StoreData>(Encoding.UTF8.GetString(bytes));
 
-        for(int i = 0; i < storeData.Length; i++)
+        for(int i = 0; i < storeData.objData.Length; i++)
         {
-            StoreData d = storeData[i];
+            ObjData d = storeData.objData[i];
             CustomData cdata = ContentManager.instance.AddObj(Path.Combine(targetDir, d.objName));
             cdata.go.name = d.name;
 
@@ -101,7 +124,7 @@ public class StoreManager : MonoBehaviour
 
         }
 
-        UIManager.instance.UpdateContentBrowser();
+        UIManager.instance.UpdateContentBrowser(storeData.packageName, storeData.packageVersion);
     }
 
     private void SaveFile(string path, byte[] bytes)

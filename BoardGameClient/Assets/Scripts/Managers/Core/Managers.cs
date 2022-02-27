@@ -23,6 +23,7 @@ public class Managers : MonoBehaviour
 
                 s_instance.Network.Init();
                 s_instance.Scene.Init();
+                s_instance.Package.Init();
             }
             return s_instance;
         }
@@ -32,6 +33,7 @@ public class Managers : MonoBehaviour
     public NetworkManager Network { get; } = new NetworkManager();
     public ResourceManager Resource { get; } = new ResourceManager();
     public CustomSceneManager Scene { get; } = new CustomSceneManager();
+    public PackageManager Package { get; } = new PackageManager();
 
     public BaseScene scene { get; private set; }
     #endregion

@@ -148,24 +148,28 @@ public class CustomFileBrowser : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    // FileBrowser -> Selected
     public void Selected()
     {
-        if (_selectedAction != null)
+        UIManager.instance.OpenAcceptWindow(() =>
         {
-            if (_selectType == SelectType.File)
+            if (_selectedAction != null)
             {
-                for (int i = 0; i < selected.Count; i++)
+                if (_selectType == SelectType.File)
                 {
-                    _selectedAction.Invoke(selected[i].originPath);
+                    for (int i = 0; i < selected.Count; i++)
+                    {
+                        _selectedAction.Invoke(selected[i].originPath);
+                    }
+                }
+                else
+                {
+                    _selectedAction.Invoke(currentPathText.text);
                 }
             }
-            else
-            {
-                _selectedAction.Invoke(currentPathText.text);
-            }
-        }
-        ValueClear();
-        gameObject.SetActive(false);
+            ValueClear();
+            gameObject.SetActive(false);
+        }, null);
     }
 
 

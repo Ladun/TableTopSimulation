@@ -11,6 +11,7 @@ using System.Text;
 class PacketHandler
 {
 
+    #region Global
     public static void C_ChatHandler(PacketSession session, IMessage packet)
     {
         C_Chat chatPacket = packet as C_Chat;
@@ -23,6 +24,33 @@ class PacketHandler
 
         Logger.Instance.Print("[Chat]" +sChatPacket.Chat);
     }
+    public static void C_FileTransferHandler(PacketSession session, IMessage packet)
+    {
+        C_FileTransfer filePacket = packet as C_FileTransfer;
+        ClientSession clientSession = session as ClientSession;
+
+        if (filePacket.SendCode == 0)
+        {
+            S_FileTransfer sFilePacket = new S_FileTransfer();
+            sFilePacket.SendCode = 1;
+            sFilePacket.Name = filePacket.Name;
+            if (PackageManager.Instance.HasFile(filePacket.Name))
+            {
+                sFilePacket.Filebytes = ByteString.CopyFrom(PackageManager.Instance.GetFileByte(filePacket.Name));
+            }
+
+            clientSession.Send(sFilePacket);
+        }
+        else if (filePacket.SendCode == 1)
+        {
+            //if (filePacket.HasFilebytes)
+            {
+                PackageManager.Instance.SaveFile(filePacket.Name, filePacket.Filebytes.ToByteArray());
+            }
+        }
+
+    }
+    #endregion
 
     #region Intro Scene
     public static void C_LoginHandler(PacketSession session, IMessage packet)

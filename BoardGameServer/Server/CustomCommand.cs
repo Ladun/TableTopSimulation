@@ -96,6 +96,7 @@ namespace Server
                 }
 
                 sChatPacket.Chat = "[Server] " + sb.ToString();
+                successMsg = sChatPacket.Chat;
                 PlayerProfileManager.Instance.Broadcast(sChatPacket);
                 return;
             }

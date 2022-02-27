@@ -8,12 +8,40 @@ using UnityEngine;
 class PacketHandler
 {
 
-	public static void S_ChatHandler(PacketSession session, IMessage packet)
+    #region Global
+
+    public static void S_ChatHandler(PacketSession session, IMessage packet)
 	{
 		S_Chat chatPacket = packet as S_Chat;
 
 		Managers.Instance.GetUIManager<LobbyUIManager>().UpdateChatting(chatPacket);
 	}
+
+	public static void S_FileTransferHandler(PacketSession session, IMessage packet)
+	{
+		S_FileTransfer filePacket = packet as S_FileTransfer;
+
+		if(filePacket.SendCode == 0)
+        {
+			C_FileTransfer cFilePacket = new C_FileTransfer();
+			cFilePacket.SendCode = 1;
+			cFilePacket.Name = filePacket.Name;
+            if (Managers.Instance.Package.HasFile(filePacket.Name))
+			{
+				cFilePacket.Filebytes = ByteString.CopyFrom(Managers.Instance.Package.GetFileByte(filePacket.Name));
+			}
+			Managers.Instance.Network.Send(cFilePacket);
+		}
+		else if(filePacket.SendCode == 1)
+        {
+			//if (filePacket.HasFilebytes)
+			{
+				Managers.Instance.Package.SaveFile(filePacket.Name, filePacket.Filebytes.ToByteArray());
+			}
+        }
+
+	}
+	#endregion
 
 	#region Intro Scene
 	public static void S_LoginHandler(PacketSession session, IMessage packet)

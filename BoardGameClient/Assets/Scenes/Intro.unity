@@ -2476,6 +2476,7 @@ MonoBehaviour:
   tooltips: []
   playerNicknameInput: {fileID: 473109796}
   serverIpInput: {fileID: 104548445}
+  testText: {fileID: 0}
   serverIpDropdown: {fileID: 1364809710}
 --- !u!1 &1017862996
 GameObject:

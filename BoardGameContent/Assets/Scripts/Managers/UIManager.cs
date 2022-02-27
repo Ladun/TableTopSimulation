@@ -23,10 +23,19 @@ public class UIManager : MonoBehaviour
 
     public CustomFileBrowser fileBrowser;
     public CustomContentBrowser contentBrowser;
+    public AcceptWindow acceptWindow;
 
-    public void UpdateContentBrowser()
+    public void UpdateContentBrowser(string packageName, string packageVersion)
     {
+        contentBrowser.packageName.text = packageName;
+        contentBrowser.packageVersion.text = packageVersion;
+
         contentBrowser.UpdateBrowser();
+    }
+
+    public void OpenAcceptWindow(System.Action acceptAction, System.Action cancleAction)
+    {
+        acceptWindow.Open(acceptAction, cancleAction);
     }
 
     public void OpenObjFileBrowser()
@@ -65,7 +74,7 @@ public class UIManager : MonoBehaviour
             }, 
             (path) =>
             {
-                StoreManager.instance.Save(path);
+                StoreManager.instance.Save(contentBrowser.packageName.text, contentBrowser.packageVersion.text, path);
             }, CustomFileBrowser.SelectType.Directory);
     }
     public void OpenLoadFileBrowser()

@@ -1,14 +1,14 @@
 ﻿using Google.Protobuf;
 using Google.Protobuf.Protocol;
+using ServerCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Server.Game
 {
-    class PlayerProfileManager
+    class PlayerProfileManager : Singleton<PlayerProfileManager>
     {
-        public static PlayerProfileManager Instance { get; } = new PlayerProfileManager();
 
         object _lock = new object();
         Dictionary<int, PlayerProfile> _players = new Dictionary<int, PlayerProfile>();

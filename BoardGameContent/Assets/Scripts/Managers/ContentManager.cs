@@ -38,6 +38,11 @@ public class ContentManager : MonoBehaviour
         return cmm;
     }
 
+    public void DeleteObj(int idx)
+    {
+        _data.RemoveAt(idx);
+    }
+
     public void ActiveData(int idx)
     {
         activeDataIdx = idx;
