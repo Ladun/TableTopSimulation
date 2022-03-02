@@ -58,7 +58,7 @@ public class LobbyScene : BaseScene
     public void SendFile()
     {
         C_FileTransfer fileTransfer = new C_FileTransfer();
-        fileTransfer.SendCode = 0;
+        fileTransfer.Flag = 0;
         fileTransfer.Name = "Card.obj";
         Managers.Instance.Network.Send(fileTransfer);
     }
@@ -120,12 +120,46 @@ public class LobbyScene : BaseScene
     
     public void SendEnterRoom(RoomInfo roomInfo)
     {
-        C_EnterRoom enterRoomPacket = new C_EnterRoom();
-        enterRoomPacket.RoomInfo = roomInfo;
-        Managers.Instance.Network.Send(enterRoomPacket);
+        List<string> notHavePakcages = new List<string>();
+        for(int i = 0; i < roomInfo.PackageCodes.Count; i++)
+        {
+            if (!Managers.Instance.Package.HasPackage(roomInfo.PackageCodes[i]))
+                notHavePakcages.Add(roomInfo.PackageCodes[i]);
+        }
 
-        Managers.Instance.GetUIManager<LobbyUIManager>().OpenLoading("Waiting For Enter Room...", clear:(roomInfo == selectedRoomInfo));
+        if (notHavePakcages.Count > 0)
+        {
+            Managers.Instance.GetUIManager<LobbyUIManager>().OpenPopupItem("AcceptWindow").GetComponent<AcceptWindow>().Setting(
+                "You need to download some packages. Do you want it?",
+                () => {
+                    StartCoroutine(RequestPackages(roomInfo, notHavePakcages));
+                }, null);
+            
+        }
+        else
+        {
+            C_EnterRoom enterRoomPacket = new C_EnterRoom();
+            enterRoomPacket.RoomInfo = roomInfo;
+            Managers.Instance.Network.Send(enterRoomPacket);
+
+            Managers.Instance.GetUIManager<LobbyUIManager>().OpenLoading("Waiting For Enter Room...", clear: (roomInfo == selectedRoomInfo));
+        }
     }
+
+    private IEnumerator RequestPackages(RoomInfo roomInfo, List<string> requestCodes)
+    {
+        yield return StartCoroutine(Managers.Instance.Package.RequestPackage(roomInfo.RoomId, requestCodes,
+            (code)=>
+            {
+                Managers.Instance.GetUIManager<LobbyUIManager>().OpenLoading($"Package: [{code}] downloading...", false);
+            }));
+
+        Managers.Instance.GetUIManager<LobbyUIManager>().CloseLoading();
+        Managers.Instance.Package.UpdatePackagesList();
+
+        SendEnterRoom(roomInfo);
+    }
+
     #endregion
 
     #region Lobby Design

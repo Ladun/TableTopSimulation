@@ -29,6 +29,8 @@ class PacketManager
 		_handler.Add((ushort)MsgId.SChat, PacketHandler.S_ChatHandler);		
 		_onRecv.Add((ushort)MsgId.SFileTransfer, MakePacket<S_FileTransfer>);
 		_handler.Add((ushort)MsgId.SFileTransfer, PacketHandler.S_FileTransferHandler);		
+		_onRecv.Add((ushort)MsgId.SPackageTransfer, MakePacket<S_PackageTransfer>);
+		_handler.Add((ushort)MsgId.SPackageTransfer, PacketHandler.S_PackageTransferHandler);		
 		_onRecv.Add((ushort)MsgId.SRoomList, MakePacket<S_RoomList>);
 		_handler.Add((ushort)MsgId.SRoomList, PacketHandler.S_RoomListHandler);		
 		_onRecv.Add((ushort)MsgId.SPlayerList, MakePacket<S_PlayerList>);

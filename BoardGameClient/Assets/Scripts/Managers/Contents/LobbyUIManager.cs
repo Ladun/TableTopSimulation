@@ -36,13 +36,15 @@ public class LobbyUIManager : UIManager
         }
     }
 
-    public void OpenPopupItem(string popupName)
+    public Transform OpenPopupItem(string popupName)
     {
         Transform popup = popupList.Find(x => x.name.Equals(popupName));
         if(popup != null)
         {
             OpenPopupItem(popup);
         }
+
+        return popup;
     }
 
     public void ClosePopupItem(string popupName)

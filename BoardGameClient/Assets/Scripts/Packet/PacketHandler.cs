@@ -3,6 +3,7 @@ using Google.Protobuf.Protocol;
 using ServerCore;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 class PacketHandler
@@ -21,10 +22,10 @@ class PacketHandler
 	{
 		S_FileTransfer filePacket = packet as S_FileTransfer;
 
-		if(filePacket.SendCode == 0)
+		if((filePacket.Flag & 1) == 0)
         {
 			C_FileTransfer cFilePacket = new C_FileTransfer();
-			cFilePacket.SendCode = 1;
+			cFilePacket.Flag |= 1;
 			cFilePacket.Name = filePacket.Name;
             if (Managers.Instance.Package.HasFile(filePacket.Name))
 			{
@@ -32,14 +33,27 @@ class PacketHandler
 			}
 			Managers.Instance.Network.Send(cFilePacket);
 		}
-		else if(filePacket.SendCode == 1)
+		else if((filePacket.Flag & 1) == 1)
         {
 			//if (filePacket.HasFilebytes)
 			{
-				Managers.Instance.Package.SaveFile(filePacket.Name, filePacket.Filebytes.ToByteArray());
+				Managers.Instance.Package.SaveFile(filePacket.PackageName, filePacket.Name, (filePacket.Flag >> 1), filePacket.Filebytes.ToByteArray());
 			}
         }
 
+	}
+	public static void S_PackageTransferHandler(PacketSession session, IMessage packet)
+	{
+		S_PackageTransfer packageTransfer = packet as S_PackageTransfer;
+
+		if (packageTransfer.SendCode == 0)
+		{
+			Managers.Instance.StartCoroutine(Managers.Instance.Package.SendPackage(packageTransfer.PackageCode, packageTransfer.RequesterPlayerId));
+		}
+		else if(packageTransfer.SendCode == 1)
+        {
+			Managers.Instance.Package.LoadPackagesFromServer = false;
+        }
 	}
 	#endregion
 
@@ -145,11 +159,10 @@ class PacketHandler
 				return;
 
 			uiManager.CloseLoading();
-			uiManager.OpenPopupItem("InformationDisplayPopup");
 			string failMessage = "Room is Full";
 			if (enterGamePacket.SuccessCode == 3)
 				failMessage = "There is no Room";
-			uiManager.GetPopupItem("InformationDisplayPopup").GetComponent<InformationDisplayPopup>().Setting(failMessage);
+			uiManager.OpenPopupItem("InformationDisplayPopup").GetComponent<InformationDisplayPopup>().Setting(failMessage);
 		}
 
 	}
@@ -161,7 +174,7 @@ class PacketHandler
 		if (scene == null)
 			return;
 		scene.LeaveLobby();
-	}
+	}	
 	#endregion
 
 	#region Game Scene

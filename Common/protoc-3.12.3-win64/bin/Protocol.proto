@@ -11,6 +11,8 @@ enum MsgId {
 	S_CHAT = 0x0003;
 	C_FILE_TRANSFER = 0x0004;
 	S_FILE_TRANSFER = 0x0005;
+	C_PACKAGE_TRANSFER = 0x0006;
+	S_PACKAGE_TRANSFER = 0x0007;
 	C_ROOM_LIST = 0x2002;
 	S_ROOM_LIST = 0x2003;
 	C_PLAYER_LIST = 0x2004;
@@ -78,15 +80,33 @@ message S_Chat{
 }
 
 message C_FileTransfer {
-	int32 sendCode = 1; 
+	int32 flag = 1; 
 	string name = 2;
-	bytes filebytes = 3;
+	string packageName = 3;
+	int32 targetPlayerId = 4;
+	bytes filebytes = 5;
 }
 
 message S_FileTransfer{ 
-	int32 sendCode = 1;
+	int32 flag = 1;
 	string name = 2;
-	bytes filebytes = 3;
+	string packageName = 3;
+	bytes filebytes = 4;
+}
+
+message C_PackageTransfer {
+	int32 sendCode = 1; 
+	int32 roomId = 2;
+	string packageCode = 3;
+	
+	int32 requesterPlayerId = 4;
+}
+
+message S_PackageTransfer { 
+	int32 sendCode = 1;
+	string packageCode = 2;
+	
+	int32 requesterPlayerId = 3;
 }
 
 message C_MakeRoom{
@@ -152,8 +172,8 @@ message S_LeaveLobby{
 }
 
 message C_Move {
-	repeated int32 objectId =1;
-	repeated Dim3Info pos=2;
+	repeated int32 objectId = 1;
+	repeated Dim3Info pos = 2;
 	repeated Dim3Info angle = 3;
 }
 
@@ -239,6 +259,7 @@ message RoomInfo{
 	string name = 2;
 	int32 ownerId = 3;
 	int32 maxPlayers = 4;
+	repeated string packageCodes = 5;
 }
 
 message CColor{

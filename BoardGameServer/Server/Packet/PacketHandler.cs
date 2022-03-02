@@ -29,10 +29,10 @@ class PacketHandler
         C_FileTransfer filePacket = packet as C_FileTransfer;
         ClientSession clientSession = session as ClientSession;
 
-        if (filePacket.SendCode == 0)
+        if ((filePacket.Flag & 1) == 0)
         {
             S_FileTransfer sFilePacket = new S_FileTransfer();
-            sFilePacket.SendCode = 1;
+            sFilePacket.Flag = 1;
             sFilePacket.Name = filePacket.Name;
             if (PackageManager.Instance.HasFile(filePacket.Name))
             {
@@ -41,14 +41,53 @@ class PacketHandler
 
             clientSession.Send(sFilePacket);
         }
-        else if (filePacket.SendCode == 1)
+        else if ((filePacket.Flag & 1) == 1)
         {
-            //if (filePacket.HasFilebytes)
+            if (filePacket.TargetPlayerId == 0)
             {
-                PackageManager.Instance.SaveFile(filePacket.Name, filePacket.Filebytes.ToByteArray());
+                PackageManager.Instance.SaveFile(filePacket.PackageName, filePacket.Name, filePacket.Filebytes.ToByteArray());
+            }
+            else{
+                S_FileTransfer sFilePacket = new S_FileTransfer();
+                sFilePacket.Flag = 1;
+                sFilePacket.Flag |= filePacket.Flag;
+                sFilePacket.Name = filePacket.Name;
+                sFilePacket.PackageName = filePacket.PackageName;
+                sFilePacket.Filebytes = filePacket.Filebytes;
+
+                PlayerProfile requester = PlayerProfileManager.Instance.Find(filePacket.TargetPlayerId);
+                requester.Session.Send(sFilePacket);
             }
         }
 
+    }
+
+    public static void C_PackageTransferHandler(PacketSession session, IMessage packet)
+    {
+        C_PackageTransfer packageTransfer = packet as C_PackageTransfer;
+        ClientSession clientSession = session as ClientSession;
+
+
+        S_PackageTransfer sPackageTransfer = new S_PackageTransfer();
+        if (packageTransfer.SendCode == 0)
+        {
+            // 방에 들어오는 사람이 보냄
+            GameRoom room = RoomManager.Instance.Find(packageTransfer.RoomId);
+            PlayerProfile owner = PlayerProfileManager.Instance.Find(room.OwnerId);
+            sPackageTransfer.SendCode = 0;
+            sPackageTransfer.PackageCode = packageTransfer.PackageCode;
+            sPackageTransfer.RequesterPlayerId = clientSession.Profile.Id;
+            owner.Session.Send(sPackageTransfer);
+        }
+        else if(packageTransfer.SendCode == 1)
+        {
+            // Owner가 보냄
+            PlayerProfile requester = PlayerProfileManager.Instance.Find(packageTransfer.RequesterPlayerId);
+            sPackageTransfer.SendCode = 1;
+            sPackageTransfer.PackageCode = packageTransfer.PackageCode;
+
+            requester.Session.Send(sPackageTransfer);
+        }
     }
     #endregion
 
@@ -79,7 +118,11 @@ class PacketHandler
         if (RoomManager.Instance.FindByOwnerId(playerId) != null)
             return;
 
-        RoomInfo roomInfo = RoomManager.Instance.Add(playerId, makeRoomPacket.Name, makeRoomPacket.Type, makeRoomPacket.V1, makeRoomPacket.V2, makeRoomPacket.MaxPlayers).GetRoomInfo();
+        RoomInfo roomInfo = RoomManager.Instance.Add(
+            playerId, makeRoomPacket.Name,
+            makeRoomPacket.Type, makeRoomPacket.V1, makeRoomPacket.V2,
+            makeRoomPacket.MaxPlayers,
+            makeRoomPacket.PacakgeCodes).GetRoomInfo();
 
         Logger.Instance.Print("MakeRoom: " + playerId + "| " + roomInfo.Name );
 

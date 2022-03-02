@@ -34,6 +34,7 @@ public class RoomMakePopup : MonoBehaviour
             {
                 packageListContent = Instantiate(packageListPrefab);
                 packageListContent.SetParent(packageListParent);
+                packageListContent.localScale = Vector3.one;
             }
 
             packageListContent.gameObject.SetActive(true);

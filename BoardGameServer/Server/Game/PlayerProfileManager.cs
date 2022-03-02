@@ -32,12 +32,12 @@ namespace Server.Game
             }
         }
 
-        public PlayerProfile Find(int objectId)
+        public PlayerProfile Find(int playerId)
         {
             lock (_lock)
             {
                 PlayerProfile player = null;
-                if (_players.TryGetValue(objectId, out player))
+                if (_players.TryGetValue(playerId, out player))
                 {
                     return player;
                 }

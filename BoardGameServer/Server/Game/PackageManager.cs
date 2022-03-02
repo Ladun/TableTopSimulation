@@ -37,11 +37,11 @@ namespace Server
             }
         }
 
-        public void SaveFile(string fileName, byte[] fileBytes)
+        public void SaveFile(string packageCode, string fileName, byte[] fileBytes)
         {
             lock (_lock)
             {
-                File.WriteAllBytes(GetPath(fileName), fileBytes);
+                File.WriteAllBytes(GetPath(Path.Combine(packageCode, fileName)), fileBytes);
             }
         }
 

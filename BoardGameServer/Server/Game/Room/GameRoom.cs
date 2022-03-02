@@ -24,23 +24,27 @@ namespace Server.Game
             }
         }
 
-        string _roomName;
+        private string _roomName;
         public string RoomName { get { return _roomName; } }
-        int _maxPlayers;
+        private int _maxPlayers;
 
         public ObjectManager objectManager = new ObjectManager();
-        MapInfo mapInfo;
+        private MapInfo _mapInfo;
 
-        private List<CColor> colors = new List<CColor>();
-        private List<string> packageCodes = new List<string>();
+        private List<CColor> _colors = new List<CColor>();
+        private List<string> _packageCodes = new List<string>();
 
-        public GameRoom(int ownerId, string roomName, MapType mapType, float v1, float v2, int maxPlayers)
+        public GameRoom(int ownerId, string roomName, MapType mapType, float v1, float v2, int maxPlayers, RepeatedField<string> packageCodes)
         {
             OwnerId = ownerId;
             _roomName = roomName;
             _maxPlayers = maxPlayers;
+            for(int i = 0; i < packageCodes.Count; i++)
+            {
+                _packageCodes.Add(packageCodes[i]);
+            }
 
-            mapInfo = MapInfo.CreateMapInfo(mapType, v1, v2);
+            _mapInfo = MapInfo.CreateMapInfo(mapType, v1, v2);
 
             Random random = new Random();
             for (int i = 0; i < maxPlayers; i++)
@@ -49,7 +53,7 @@ namespace Server.Game
                 color.R = random.Next(256);
                 color.G = random.Next(256);
                 color.B = random.Next(256);
-                colors.Add(color);
+                _colors.Add(color);
             }
         }
 
@@ -90,7 +94,7 @@ namespace Server.Game
             player.Profile.Room = this;
             player.Info.Name = profile.Name;
 
-            player.Info.Pos = Vector3.Vector32Dim3(mapInfo.GetPlayerPosition(player.Info.Flag, 3));
+            player.Info.Pos = Vector3.Vector32Dim3(_mapInfo.GetPlayerPosition(player.Info.Flag, 3));
 
             EnterGame(player);
         }
@@ -113,7 +117,7 @@ namespace Server.Game
                         enterPacket.RoomInfo = GetRoomInfo();
                         enterPacket.PlayerInfo = player.Info;
                         enterPacket.SuccessCode = 1;
-                        foreach (CColor c in colors)
+                        foreach (CColor c in _colors)
                             enterPacket.Colors.Add(c);
                         player.Profile.Session.Send(enterPacket);
 
@@ -332,13 +336,21 @@ namespace Server.Game
 
         public RoomInfo GetRoomInfo()
         {
-            return new RoomInfo()
+
+            RoomInfo roomInfo = new RoomInfo()
             {
                 RoomId = RoomId,
                 Name = _roomName,
                 OwnerId = OwnerId,
                 MaxPlayers = _maxPlayers
             };
+
+            for(int i = 0; i < _packageCodes.Count; i++)
+            {
+                roomInfo.PackageCodes.Add(_packageCodes[i]);
+            }
+
+            return roomInfo;
         }
     }
 }

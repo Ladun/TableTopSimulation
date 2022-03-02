@@ -14,12 +14,12 @@ namespace Server.Game
         Dictionary<int, GameRoom> _rooms = new Dictionary<int, GameRoom>();
         int _roomId = 1;
 
-        public GameRoom Add(int playerId, string roomName, MapType mapType, float v1, float v2, int maxPlayers)
+        public GameRoom Add(int playerId, string roomName, MapType mapType, float v1, float v2, int maxPlayers, RepeatedField<string> packageCodes)
         {
             if (string.IsNullOrEmpty(roomName))
                 roomName = "Room_" + _roomId;
 
-            GameRoom gameRoom = new GameRoom(playerId, roomName, mapType, v1, v2, maxPlayers);
+            GameRoom gameRoom = new GameRoom(playerId, roomName, mapType, v1, v2, maxPlayers, packageCodes);
 
             lock (_lock)
             {
