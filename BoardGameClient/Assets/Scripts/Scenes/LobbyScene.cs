@@ -130,7 +130,7 @@ public class LobbyScene : BaseScene
         if (notHavePakcages.Count > 0)
         {
             Managers.Instance.GetUIManager<LobbyUIManager>().OpenPopupItem("AcceptWindow").GetComponent<AcceptWindow>().Setting(
-                "You need to download some packages. Do you want it?",
+                "You need to download some packages.\n Do you want it?",
                 () => {
                     StartCoroutine(RequestPackages(roomInfo, notHavePakcages));
                 }, null);

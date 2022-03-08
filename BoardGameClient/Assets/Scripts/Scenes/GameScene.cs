@@ -7,8 +7,12 @@ using UnityEngine;
 public class GameScene : BaseScene
 {
     public ObjectManager objectManager { get; } = new ObjectManager();
+    private GameUIManager uiManager
+    {
+        get { return baseUIManager as GameUIManager; }
+    }
 
-    private RoomInfo roomInfo;
+    private RoomInfo _roomInfo;
 
     public Player myPlayer;
     public CameraController cam;
@@ -39,7 +43,7 @@ public class GameScene : BaseScene
 
     public void Setting(RoomInfo roomInfo, ObjectInfo playerInfo, RepeatedField<CColor> colors)
     {
-        this.roomInfo = roomInfo;
+        this._roomInfo = roomInfo;
 
         // Get Players Color
         foreach (CColor c in colors)
@@ -53,7 +57,7 @@ public class GameScene : BaseScene
 
         // Camera Setting
         cam.Init(Utils.Dim3Info2Vector3(playerInfo.Pos));
-
+        uiManager.LoadAllGames(roomInfo.PackageCodes);
 
         SettingFinish = true;
     }
@@ -78,12 +82,13 @@ public class GameScene : BaseScene
         Managers.Instance.Network.Send(leaveRoomPacket);
     }
 
-    public void SendSpawnObject(string objName, GameObjectType type)
+    public void SendSpawnObject(string objName, string packageCode, GameObjectType type)
     {
         Vector3 pos = cam.GetUpperTablePosition() + Vector3.up * 0.1f;
 
         C_Spawn spawnPacket = new C_Spawn();
         spawnPacket.Name = objName;
+        spawnPacket.PackageCode = packageCode;
         spawnPacket.Pos = Utils.Vector32Dim3Info(pos);
         spawnPacket.Angle = Utils.Vector32Dim3Info(new Vector3(0, cam.transform.eulerAngles.y, 0));
         spawnPacket.ObjectType = type;
@@ -94,7 +99,7 @@ public class GameScene : BaseScene
     public void SendDespawnObject(int objId)
     {
         C_Despawn despawnPacket = new C_Despawn();
-
+        
         despawnPacket.ObjectIds.Add(objId);
 
         Managers.Instance.Network.Send(despawnPacket);

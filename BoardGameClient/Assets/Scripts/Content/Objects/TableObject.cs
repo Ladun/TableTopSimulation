@@ -48,16 +48,18 @@ public class TableObject : MonoBehaviour
     [Header("For UI")]
     public Sprite image;
 
-    private void Awake()
+    protected void BasicSetting()
     {
         outline = GetComponent<Outline>();
         outline.enabled = false;
 
         rigidBody = GetComponent<Rigidbody>();
-        Init();
     }
+
     public virtual void Init()
     {
+        BasicSetting();
+
         eventDict.Add(TableObjectEventType.Over, OverEvent);
         eventDict.Add(TableObjectEventType.Select, SelectEvent);
         eventDict.Add(TableObjectEventType.Lock, LockEvent);

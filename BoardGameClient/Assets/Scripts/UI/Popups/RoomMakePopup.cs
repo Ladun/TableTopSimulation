@@ -23,7 +23,7 @@ public class RoomMakePopup : MonoBehaviour
     private void OnEnable()
     {
         int idx = 0;
-        foreach(var key in Managers.Instance.Package.packageCodes.Keys)
+        foreach(var key in Managers.Instance.Package.packageDict.Keys)
         {
             Transform packageListContent = null;
             if(idx < packageListParent.childCount)
@@ -40,7 +40,7 @@ public class RoomMakePopup : MonoBehaviour
             packageListContent.gameObject.SetActive(true);
 
             // Settings
-            PackageManager.StoreData data = Managers.Instance.Package.packageCodes[key];
+            PackageManager.StoreData data = Managers.Instance.Package.packageDict[key];
             packageListContent.GetChild(0).GetComponent<TextMeshProUGUI>().text = key;
 
             idx++;

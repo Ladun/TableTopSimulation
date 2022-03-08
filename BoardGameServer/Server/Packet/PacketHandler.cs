@@ -212,10 +212,10 @@ class PacketHandler
             return;
 
         if (spawnPacket.ObjectType == GameObjectType.Preset)
-            room.EnterObject<Preset>(spawnPacket.Name, spawnPacket.Pos, spawnPacket.Angle);
+            room.EnterObject<Preset>(spawnPacket.Name, "", spawnPacket.Pos, spawnPacket.Angle);
 
         else
-            room.EnterObject<TableObject>(spawnPacket.Name, spawnPacket.Pos, spawnPacket.Angle);
+            room.EnterObject<TableObject>(spawnPacket.Name, spawnPacket.PackageCode, spawnPacket.Pos, spawnPacket.Angle);
 
     }
 

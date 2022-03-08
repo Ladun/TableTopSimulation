@@ -195,12 +195,12 @@ message S_Interact{
 	int32 playerId = 3;
 }
 
-message C_Spawn{
-	
-	string name = 1;
+message C_Spawn{	
+	GameObjectType objectType = 1;
 	Dim3Info pos = 2;
 	Dim3Info angle = 3;
-	GameObjectType objectType = 4;
+	string name = 4;
+	string packageCode = 5;
 }
 
 message S_Spawn{ 
@@ -249,9 +249,10 @@ message Dim3Info{
 message ObjectInfo{
 	int32 objectId = 1;
 	string name = 2;
-	Dim3Info pos = 3;
-	Dim3Info angle = 4;
-	int32 flag = 5;
+	string packageCode = 3;
+	Dim3Info pos = 4;
+	Dim3Info angle = 5;
+	int32 flag = 6;
 }
 
 message RoomInfo{

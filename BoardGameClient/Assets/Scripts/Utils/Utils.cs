@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 using static Define;
 
 public class Utils 
@@ -32,6 +33,24 @@ public class Utils
           Mathf.SmoothDampAngle(current.y, target.y, ref currentVelocity.y, smoothTime),
           Mathf.SmoothDampAngle(current.z, target.z, ref currentVelocity.z, smoothTime)
         );
+    }
+
+    public static IEnumerator CoLoadTexture(string path, System.Action<Texture2D> action = null)
+    {
+        // Start a download of the given URL
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(path);
+
+        // Wait for download to complete
+        yield return www.SendWebRequest();
+        if (www.result == UnityWebRequest.Result.Success)
+        {
+            // assign texture
+            Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            if (action != null)
+            {
+                action.Invoke(texture);
+            }
+        }
     }
 
     public static DirTreeStruct GetDirectoryTree(string root)

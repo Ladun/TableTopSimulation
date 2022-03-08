@@ -150,7 +150,7 @@ namespace Server.Game
             {
                 if (to.parentSet == null) // Other is T.O
                 {
-                    set = Room.EnterObject<TableObjectSet>("tableObjectSet", to.Info.Pos, to.Info.Angle);
+                    set = Room.EnterObject<TableObjectSet>("tableObjectSet", "", to.Info.Pos, to.Info.Angle);
 
                     set.Add(to);
                     set.Add(this);

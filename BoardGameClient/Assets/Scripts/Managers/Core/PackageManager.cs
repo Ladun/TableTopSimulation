@@ -15,6 +15,11 @@ public class PackageManager
         public string packageName;
         public string packageVersion;
         public ObjData[] objData;
+
+        public string GetPackageCode()
+        {
+            return packageName + packageVersion;
+        }
     }
 
     [System.Serializable]
@@ -31,8 +36,8 @@ public class PackageManager
     private const float packageTimeout = 5f;
     private const int byteSegmentSize = 1024;
 
-    private Dictionary<string, StoreData> _packageCodes = new Dictionary<string, StoreData>();
-    public Dictionary<string, StoreData> packageCodes { get { return _packageCodes; } }
+    private Dictionary<string, StoreData> _packageDict = new Dictionary<string, StoreData>();
+    public Dictionary<string, StoreData> packageDict { get { return _packageDict; } }
 
     public bool LoadPackagesFromServer = false;
 
@@ -50,7 +55,7 @@ public class PackageManager
 
 #if UNITY_EDITOR
         Debug.Log("Packages Code: ");
-        foreach(var d in _packageCodes)
+        foreach(var d in _packageDict)
         {
             Debug.Log(d);
         }
@@ -61,7 +66,7 @@ public class PackageManager
 
     public void UpdatePackagesList()
     {
-        _packageCodes.Clear();
+        _packageDict.Clear();
         // Check packages
         string[] packages = Directory.GetDirectories(packageDir);
         for (int i = 0; i < packages.Length; i++)
@@ -71,14 +76,14 @@ public class PackageManager
                 byte[] bytes = Utils.LoadFile(Path.Combine(packages[i], "package.json"));
                 StoreData storeData = JsonUtility.FromJson<StoreData>(Encoding.UTF8.GetString(bytes));
 
-                _packageCodes.Add(storeData.packageName + storeData.packageVersion, storeData);
+                _packageDict.Add(storeData.packageName + storeData.packageVersion, storeData);
             }
         }
     }
 
     public bool HasPackage(string packageCode)
     {
-        return packageCodes.ContainsKey(packageCode);
+        return packageDict.ContainsKey(packageCode);
     }
 
     public IEnumerator RequestPackage(int roomId, List<string> requestCodes, System.Action<string> eachStartAction)
@@ -117,7 +122,7 @@ public class PackageManager
         StoreData package;
 
         string targetDir = Path.Combine(packageDir, packageCode);
-        if(packageCodes.TryGetValue(packageCode, out package))
+        if(packageDict.TryGetValue(packageCode, out package))
         {
             byte[] bytes;
 

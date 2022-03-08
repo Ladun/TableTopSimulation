@@ -10,16 +10,12 @@ public class UIObjectListContent : UIListContent<UIObjectListContent.ObjectListS
 {
     public struct ObjectListStruct
     {
-        public string path;
         public bool isDir;
         public bool isPreset;
-        public TableObject item;
+        public string packageCode;
+        public PackageManager.ObjData item;
         public DirTreeStruct dts;
 
-        public string GetName()
-        {
-            return Utils.GetNameFromPath(path);
-        }
     }
 
     public Sprite dirImage;
@@ -50,7 +46,8 @@ public class UIObjectListContent : UIListContent<UIObjectListContent.ObjectListS
                 if (item.isPreset)
                     type = GameObjectType.Preset;
 
-                Managers.Instance.GetScene<GameScene>().SendSpawnObject(item.path, type);
+                // TODO: spawn by ObjData
+                Managers.Instance.GetScene<GameScene>().SendSpawnObject(item.item.name, item.packageCode, type);
             }
         });
 
@@ -75,9 +72,10 @@ public class UIObjectListContent : UIListContent<UIObjectListContent.ObjectListS
         else
         {
             background.SetActive(true);
-            objectImage.sprite = item.item.image;
+            // TODO: set obj image
+            // objectImage.sprite = item.item.image;
         }
-        objectName.text = item.GetName();
+        objectName.text = item.item.name;
 
     }
 }

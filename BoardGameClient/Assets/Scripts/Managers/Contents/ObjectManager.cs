@@ -1,6 +1,8 @@
+using Dummiesman;
 using Google.Protobuf.Protocol;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class ObjectManager 
@@ -8,6 +10,9 @@ public class ObjectManager
 
     private Dictionary<int, Player> _players = new Dictionary<int, Player>();
     private Dictionary<int, TableObject> _tableObjects = new Dictionary<int, TableObject>();
+
+    private OBJLoader loader = new OBJLoader();
+
 
 
     public static GameObjectType GetObjectTypeById(int id)
@@ -36,16 +41,70 @@ public class ObjectManager
         }
         else if(objectType == GameObjectType.TableObject)
         {
-            TableObject tableObject = Object.Instantiate(Managers.Instance.Resource.Get<GameObject>( info.Name)).GetComponent<TableObject>(); // Object List Popup 부분에서 Resource Load를
-            tableObject.Id = info.ObjectId;
-            tableObject.SetMoveInfo(Utils.Dim3Info2Vector3(info.Pos), Utils.Dim3Info2Vector3(info.Angle), true);
-            _tableObjects.Add(info.ObjectId, tableObject);
+            // TODO: 
+            // ObjectInfo의 PackageCode를 통해서 package를 찾고, Name을 통해서 해당 패키지 내부의 오브젝트를 찾음
+            // 해당 오브젝트를 ObjLoader를 이용해서 Load하고 이를 사용.
+            // 문제는 Collider를 어떻게 설정하냐는 것
+
+            PackageManager.StoreData data;
+            if(Managers.Instance.Package.packageDict.TryGetValue(info.PackageCode, out data))
+            {
+                PackageManager.ObjData objData = null;
+                for(int i =0;i < data.objData.Length; i++)
+                {
+                    if (data.objData[i].name.Equals(info.Name))
+                    {
+                        objData = data.objData[i];
+                        break;
+                    }
+                }
+
+                if (objData == null)
+                    return;
+
+                string localPath = Path.Combine(data.GetPackageCode(), objData.objName);
+
+                GameObject go = loader.Load(Managers.Instance.Package.GetPath(localPath));
+                if(go == null)
+                {
+                    // TODO: Error check
+                }
+
+                go.AddComponent<MeshCollider>().sharedMesh = go.GetComponentInChildren<MeshFilter>().sharedMesh;
+                go.GetComponent<MeshCollider>().convex = true;
+                go.AddComponent<Rigidbody>();
+                go.AddComponent<Outline>();
+                TableObject to = go.AddComponent<TableObject>();
+
+                go.layer = 7;
+
+                // Setting textures
+                MeshRenderer[] meshRenders = go.GetComponentsInChildren<MeshRenderer>();
+                for(int i = 0; i < meshRenders.Length && i < objData.textures.Length; i++)
+                {
+                    int _i = i;
+                    string textureLocalPath = Path.Combine(data.GetPackageCode(), objData.textures[i]);
+                    Debug.Log(textureLocalPath);
+                    Managers.Instance.StartCoroutine(Utils.CoLoadTexture(Managers.Instance.Package.GetPath(textureLocalPath), 
+                        (texture) =>
+                        {
+                            meshRenders[_i].material.mainTexture = texture;
+                        }));
+                }
+
+                to.Init();
+                to.Id = info.ObjectId;
+                to.SetMoveInfo(Utils.Dim3Info2Vector3(info.Pos), Utils.Dim3Info2Vector3(info.Angle), true);
+                _tableObjects.Add(info.ObjectId, to);
+            }
         }
         else if(objectType == GameObjectType.TableObjectSet)
         {
             TableObjectSet set = Object.Instantiate(Managers.Instance.Resource.Get<GameObject>("Prefabs/TableObjectSet")).GetComponent<TableObjectSet>();
             set.Id = info.ObjectId;
             set.SetMoveInfo(Utils.Dim3Info2Vector3(info.Pos), Utils.Dim3Info2Vector3(info.Angle), true);
+
+            set.Init();
             _tableObjects.Add(info.ObjectId, set);
         }
         else if(objectType == GameObjectType.Preset)
@@ -55,6 +114,8 @@ public class ObjectManager
             preset.SettingPreset();
             preset.Id = info.ObjectId;
             preset.SetMoveInfo(Utils.Dim3Info2Vector3(info.Pos), Utils.Dim3Info2Vector3(info.Angle), true);
+
+            preset.Init();
             _tableObjects.Add(info.ObjectId, preset);
         }
     }

@@ -59,13 +59,14 @@ namespace Server.Game
 
         #region Enter/Leave
 
-        public T EnterObject<T>(string name, Dim3Info pos, Dim3Info angle) where T : TableObject, new()
+        public T EnterObject<T>(string name, string packageCode, Dim3Info pos, Dim3Info angle) where T : TableObject, new()
         {
             T tableObject = objectManager.Add<T>();
             tableObject.Info.Pos = pos;
             tableObject.Info.Angle = angle;
             tableObject.Room = this;
             tableObject.Info.Name = name;
+            tableObject.Info.PackageCode = packageCode;
 
             EnterGame(tableObject);
 

@@ -4931,8 +4931,6 @@ MonoBehaviour:
     prefab: {fileID: 8175553526984494920, guid: 451967da6c572534f87cae5dca3d106d, type: 3}
   playerListPopup: {fileID: 1056311359}
   objectListPopup: {fileID: 1475936395}
-  games:
-  - SevenWondersDuel
 --- !u!4 &1989218492
 Transform:
   m_ObjectHideFlags: 0

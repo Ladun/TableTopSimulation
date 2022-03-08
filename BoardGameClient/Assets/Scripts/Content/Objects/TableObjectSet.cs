@@ -20,13 +20,14 @@ public class TableObjectSet : TableObject
 
     public override void Init()
     {
+        BasicSetting();
+
         eventDict.Add(TableObjectEventType.Over, OverEvent);
         eventDict.Add(TableObjectEventType.Select, SelectEvent);
         eventDict.Add(TableObjectEventType.Lock, LockEvent);
         eventDict.Add(TableObjectEventType.Merge, MergeEvent);
         eventDict.Add(TableObjectEventType.Pick, PickEvent);
         eventDict.Add(TableObjectEventType.Shuffle, ShuffleEvent);
-
     }
 
     public override void ApplyMovement()
@@ -107,7 +108,8 @@ public class TableObjectSet : TableObject
                     float y = 0;
                     for(int i = 0; i < containedObjects.Count; i++)
                     {
-                        float boundHeight = containedObjects[i].GetComponent<BoxCollider>().bounds.size.y;
+                        // TODO: 현재는 Mesh Collider를 사용하고 있으므로 Mesh Collider용으로 바꾸거나, Mesh Collider가 아닌 Box Collider 사용하기
+                        float boundHeight = containedObjects[i].GetComponent<Collider>().bounds.size.y;
                         y += boundHeight / 2;
 
                         containedObjects[i].transform.localPosition = new Vector3(0, y, 0);

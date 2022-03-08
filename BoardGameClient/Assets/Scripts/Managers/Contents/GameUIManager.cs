@@ -1,3 +1,4 @@
+using Google.Protobuf.Collections;
 using Google.Protobuf.Protocol;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,32 +17,20 @@ public class GameUIManager : UIManager
     // Object List
     public ObjectListPopup objectListPopup;
 
-    public string[] games;
-    private Dictionary<string, DirTreeStruct> tableObjectDirectoryTree = new Dictionary<string, DirTreeStruct>();
-
+    private string curPackageCode;
     private string curDir;
-    private string curGame;
-
-    private void Awake()
-    {
-    }
-
-    private void Start()
-    {
-        LoadAllGames();
-    }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             if (!ActiveSelfTooltip("ObjectControlTooltip"))
-                playerListPopup.gameObject.SetActive(true);
+                playerListPopup.SetActive(true);
         }
         if (Input.GetKeyUp(KeyCode.Tab))
         {
             if (!ActiveSelfTooltip("ObjectControlTooltip"))
-                playerListPopup.gameObject.SetActive(false);
+                playerListPopup.SetActive(false);
         }
     }
 
@@ -50,6 +39,8 @@ public class GameUIManager : UIManager
         playerContent.parent.UpdateItemList(playerContent.prefab, items);
     }
 
+
+    // Reference : ObjectListButton
     public void InteractObjectPopup(GameObject objectPopup)
     {
         if (objectPopup.activeSelf)
@@ -58,29 +49,19 @@ public class GameUIManager : UIManager
             OpenPopupItem(objectPopup.transform);
     }
 
-    private void LoadAllGames()
+    public void LoadAllGames(RepeatedField<string> packageCodes)
     {
             
-        for(int i = 0; i < games.Length; i++)
+        for(int i = 0; i < packageCodes.Count; i++)
         {
-            TextAsset jsonAsset = Resources.Load<TextAsset>(games[i] + @"\DirectoryHierarchy");
-            if (jsonAsset == null)
-                return;
-            string json = jsonAsset.text;
-            DirStructArrayWrapper dsa = JsonUtility.FromJson<DirStructArrayWrapper>(json);
-            tableObjectDirectoryTree.Add(games[i], DirTreeStruct.GetFromDirStructArray(dsa.list));
 
-            objectListPopup.AddTab(games[i]);
+            objectListPopup.AddTab(packageCodes[i]);
         }
     }
 
     public void ChangeGame(string game)
     {
-        curGame = game;
-        DirTreeStruct curGameDTS = null;
-        if (!tableObjectDirectoryTree.TryGetValue(curGame, out curGameDTS))
-            return;
-        curDir = curGameDTS.current;
+        curPackageCode = game;
         UpdateObjectList();
     }
 
@@ -92,49 +73,65 @@ public class GameUIManager : UIManager
 
     public void UpdateObjectList()
     {
-        DirTreeStruct curGameDTS = null;
-        if (!tableObjectDirectoryTree.TryGetValue(curGame, out curGameDTS))
+        PackageManager.StoreData storeData = null;
+        if (!Managers.Instance.Package.packageDict.TryGetValue(curPackageCode, out storeData))
             return;
-
-        DirTreeStruct curDTS = curGameDTS.Find(curDir);
-        if (curDTS == null)
-        {
-            Debug.LogError("DirTreeStruct Find is null");
-            return;
-        }
-
-        string cDir = curDTS.GetCurrent(curDir.Substring(0, curDir.IndexOf("Resources") + 10));
 
         List<UIObjectListContent.ObjectListStruct> items = new List<UIObjectListContent.ObjectListStruct>();
 
-        if (curDTS.parent != null)
-            items.Add(new UIObjectListContent.ObjectListStruct() { path = "..", dts = curDTS.parent, isDir = true, isPreset = false });
-
-        foreach (DirTreeStruct d in curDTS.childs)
+        for (int i = 0; i < storeData.objData.Length; i++)
         {
-            items.Add(new UIObjectListContent.ObjectListStruct() { path = d.GetLastDir(), dts = d, isDir = true, isPreset = false });
-        }
-
-        foreach(DirTreeFileInfo f in curDTS.files)
-        {
-            string fileName = cDir + "/" + f.name;
-            if (f.type == DirTreeFileInfo.FileType.Prefab)
-            {
-                TableObject to = Managers.Instance.Resource.Get<GameObject>(fileName).GetComponent<TableObject>();
-                if (to == null)
-                    continue;
-                items.Add(new UIObjectListContent.ObjectListStruct() { path = fileName, item = to, isDir = false, isPreset = false });
-            }
-            else if (f.type == DirTreeFileInfo.FileType.Json)
-            {
-                TextAsset pj = Managers.Instance.Resource.Get<TextAsset>(fileName);
-                if (pj == null)
-                    continue;
-                items.Add(new UIObjectListContent.ObjectListStruct() { path = fileName, isDir = false, isPreset = true });
-            }
+            items.Add(new UIObjectListContent.ObjectListStruct() { item = storeData.objData[i], packageCode=storeData.GetPackageCode(), isDir = false, isPreset = false });
         }
 
         objectContent.parent.UpdateItemList(objectContent.prefab, items);
-
     }
+
+    //public void UpdateObjectList()
+    //{
+    //    DirTreeStruct curGameDTS = null;
+    //    if (!tableObjectDirectoryTree.TryGetValue(curPackageCode, out curGameDTS))
+    //        return;
+
+    //    DirTreeStruct curDTS = curGameDTS.Find(curDir);
+    //    if (curDTS == null)
+    //    {
+    //        Debug.LogError("DirTreeStruct Find is null");
+    //        return;
+    //    }
+
+    //    string cDir = curDTS.GetCurrent(curDir.Substring(0, curDir.IndexOf("Resources") + 10));
+
+    //    List<UIObjectListContent.ObjectListStruct> items = new List<UIObjectListContent.ObjectListStruct>();
+
+    //    if (curDTS.parent != null)
+    //        items.Add(new UIObjectListContent.ObjectListStruct() { path = "..", dts = curDTS.parent, isDir = true, isPreset = false });
+
+    //    foreach (DirTreeStruct d in curDTS.childs)
+    //    {
+    //        items.Add(new UIObjectListContent.ObjectListStruct() { path = d.GetLastDir(), dts = d, isDir = true, isPreset = false });
+    //    }
+
+    //    foreach(DirTreeFileInfo f in curDTS.files)
+    //    {
+    //        string fileName = cDir + "/" + f.name;
+    //        if (f.type == DirTreeFileInfo.FileType.Prefab)
+    //        {
+    //            TableObject to = Managers.Instance.Resource.Get<GameObject>(fileName).GetComponent<TableObject>();
+    //            if (to == null)
+    //                continue;
+    //            items.Add(new UIObjectListContent.ObjectListStruct() { path = fileName, item = to, isDir = false, isPreset = false });
+    //        }
+    //        else if (f.type == DirTreeFileInfo.FileType.Json)
+    //        {
+    //            TextAsset pj = Managers.Instance.Resource.Get<TextAsset>(fileName);
+    //            if (pj == null)
+    //                continue;
+    //            items.Add(new UIObjectListContent.ObjectListStruct() { path = fileName, isDir = false, isPreset = true });
+    //        }
+    //    }
+
+    //    objectContent.parent.UpdateItemList(objectContent.prefab, items);
+
+    //}
 }
