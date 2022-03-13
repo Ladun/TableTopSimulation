@@ -5,6 +5,32 @@ using TMPro;
 
 public class CustomContentBrowser : MonoBehaviour
 {
+    public class WrappedData
+    {
+        public bool IsDirectory { get { return data == null; } }
+        public string dirName;
+
+        //
+        public CustomData data;
+        public int dataIdx;
+
+        public string GetText()
+        {
+            if (data == null)
+                return dirName;
+            else
+                return data.go.name;
+        }
+
+        public void SetText(string text)
+        {
+            if (data == null)
+                dirName = text;
+            else
+                data.go.name =text;
+        }
+    }
+
     [Header("Default Components")]
     public ContentBrowserContent contentPrefab;
     public Transform contentParent;
@@ -13,27 +39,55 @@ public class CustomContentBrowser : MonoBehaviour
     public TMP_InputField packageName;
     public TMP_InputField packageVersion;
 
+    private List<WrappedData> wrappedData = new List<WrappedData>();
+
     public void UpdateBrowser()
     {
 
         int idx = 0;
-        for (int i = 0; i < ContentManager.instance.data.Count; i++)
+        for (int i = 0; i < wrappedData.Count; i++)
         {
             ContentBrowserContent content = GetContentObject(idx++);
 
-            int _i = i;
             content.gameObject.SetActive(true);
-            content.Setting(ContentManager.instance.data[i], i, (btn)=>
+            content.Setting(wrappedData[i], i, (btn)=>
             {
                 ContentBrowserContent cbc = btn as ContentBrowserContent;
 
-                ContentManager.instance.DeleteObj(cbc.contentIdx);
-                UIManager.instance.contentBrowser.UpdateBrowser();
+                UIManager.instance.contentBrowser.Delete(cbc.contentIdx);
             });
         }
 
         for (; idx < contentParent.childCount; idx++)
             contentParent.GetChild(idx).gameObject.SetActive(false);
+    }
+
+    // Reference: ContentBrowser -> Add Directory
+    public void Add(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            wrappedData.Add(new WrappedData() { data =null, dirName="Directory" });
+        }
+        else
+        {
+            wrappedData.Add(new WrappedData() { data = ContentManager.instance.AddObj(path), dataIdx=ContentManager.instance.data.Count - 1 });
+        }
+        UpdateBrowser();
+    }
+
+    public void Delete(int idx)
+    {
+        // TODO: 오브젝트 삭제, 디렉토리 소속, 등등
+        if (wrappedData[idx].IsDirectory)
+        {
+        }
+        else
+        {
+            ContentManager.instance.DeleteObj(wrappedData[idx].dataIdx);
+        }
+        wrappedData.RemoveAt(idx);
+        UIManager.instance.contentBrowser.UpdateBrowser();
     }
 
     public void SetContentPosition(ContentBrowserContent cbc, float posY) 
@@ -68,7 +122,8 @@ public class CustomContentBrowser : MonoBehaviour
             content.onClick = (CustomButton b) =>
             {
                 UIManager.instance.contentBrowser.ActiveData(idx);
-                ContentManager.instance.ActiveData(idx);
+                if(!wrappedData[idx].IsDirectory)
+                    ContentManager.instance.ActiveData(wrappedData[idx].dataIdx);
             };
             _contents.Add(content);
         }

@@ -22,6 +22,7 @@ public class UIManager : MonoBehaviour
     #endregion
 
     public CustomFileBrowser fileBrowser;
+    public ColliderBrowser colliderBrowser;
     public CustomContentBrowser contentBrowser;
     public AcceptWindow acceptWindow;
 
@@ -47,8 +48,7 @@ public class UIManager : MonoBehaviour
             }, 
             (path) =>
             {
-                ContentManager.instance.AddObj(path);
-                contentBrowser.UpdateBrowser();
+                contentBrowser.Add(path);
             }
         );
     }

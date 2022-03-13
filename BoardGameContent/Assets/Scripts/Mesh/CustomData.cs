@@ -10,6 +10,9 @@ public class CustomData
     public MeshRenderer[] meshRenderers;
     public string path;
 
+    public Vector3 colliderSize;
+    public Vector3 colliderCenter;
+
     public CustomData(string objPath)
     {
         path = objPath;
@@ -18,6 +21,9 @@ public class CustomData
         meshRenderers = go.GetComponentsInChildren<MeshRenderer>();
 
         //Icon appIcon = Icon.ExtractAssociatedIcon();
+
+        colliderSize = Vector3.one;
+        colliderCenter = Vector3.one;
     }
 
     public void SetTexture(int idx, Texture2D texture)

@@ -8,33 +8,49 @@ using UnityEngine.EventSystems;
 public class ContentBrowserContent : CustomButton, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("Default Component")]
-    public CustomData md;
-    public int contentIdx;
+    public CustomContentBrowser.WrappedData wd;
+    public int contentIdx { get; set; }
     // Summary
     public TextMeshProUGUI nameText1;
 
     // Detail
     public TMP_InputField nameText2;
     public Image matTexture;
+    public CustomButton colliderButton;
     public CustomButton deleteButton;
 
     // For drag
     private Transform _parent;
     private Vector2 offset;
+    private bool isDrag;
 
     private void Start()
     {
+        transform.GetChild(1).gameObject.SetActive(false);
         _parent = transform.parent;
         matTexture.GetComponent<Button>().onClick.AddListener(() =>
         {
             UIManager.instance.OpenTextureFileBrowser(this);
         });
+
+        colliderButton.onClick = (btn) =>
+        {
+            UIManager.instance.colliderBrowser.Open();
+        };
+    }
+
+    public override void OnPointerClick(PointerEventData eventData)
+    {
+        if(!isDrag)
+            if (onClick != null)
+                onClick.Invoke(this);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         offset = eventData.position - (Vector2)transform.position;
         transform.SetParent(transform.parent.parent);
+        isDrag = true;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -46,21 +62,25 @@ public class ContentBrowserContent : CustomButton, IBeginDragHandler, IDragHandl
     {
         transform.SetParent(_parent);
         UIManager.instance.contentBrowser.SetContentPosition(this, ((Vector2)transform.parent.position - eventData.position).y);
+        isDrag = false;
     }
 
 
-    public void Setting(CustomData customMeshData, int idx, System.Action<CustomButton> deleteAction)
+    public void Setting(CustomContentBrowser.WrappedData wrappedData, int idx, System.Action<CustomButton> deleteAction)
     {
-        md = customMeshData;
-        idx = contentIdx;
+        wd = wrappedData;
+        contentIdx = idx;
 
-        SetText(md.go.name);
-        for (int i = 0; i < md.meshRenderers.Length; i++)
+        SetText(wd.GetText());
+        if (!wd.IsDirectory)
         {
-            // TODO: meshRenderer가 1개 이상일 때 UI에 이미지 추가하기
-            Texture2D texture = md.GetTexture(i) as Texture2D;
-            if (texture != null)
-                SetTexture(texture);
+            for (int i = 0; i < wd.data.meshRenderers.Length; i++)
+            {
+                // TODO: meshRenderer가 1개 이상일 때 UI에 이미지 추가하기
+                Texture2D texture = wd.data.GetTexture(i) as Texture2D;
+                if (texture != null)
+                    SetTexture(texture);
+            }
         }
 
         deleteButton.onClick = deleteAction;
@@ -70,7 +90,7 @@ public class ContentBrowserContent : CustomButton, IBeginDragHandler, IDragHandl
     {
         StartCoroutine(Utils.CoLoadTexture(path, (texture) =>
         {
-            md.SetTexture(idx, texture);
+            wd.data.SetTexture(idx, texture);
             SetTexture(texture);
         }));
     }
@@ -83,7 +103,7 @@ public class ContentBrowserContent : CustomButton, IBeginDragHandler, IDragHandl
 
     public void NameChanged(string text)
     {
-        md.go.name = text;
+        wd.SetText(text);
         SetText(text);
     }
 
@@ -106,11 +126,21 @@ public class ContentBrowserContent : CustomButton, IBeginDragHandler, IDragHandl
 
     public void Active()
     {
+        nameText2.ActivateInputField();
         transform.GetChild(0).gameObject.SetActive(false);
         transform.GetChild(1).gameObject.SetActive(true);
-        Vector2 sizeDelta = GetComponent<RectTransform>().sizeDelta;
-        sizeDelta.y = 195;
 
-        GetComponent<RectTransform>().sizeDelta = sizeDelta;
+        if (wd.IsDirectory)
+        {
+            transform.GetChild(1).GetChild(1).gameObject.SetActive(false);
+        }
+        else
+        {
+            transform.GetChild(1).GetChild(1).gameObject.SetActive(true);
+            Vector2 sizeDelta = GetComponent<RectTransform>().sizeDelta;
+            sizeDelta.y = 195;
+
+            GetComponent<RectTransform>().sizeDelta = sizeDelta;
+        }
     }
 }

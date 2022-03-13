@@ -12,6 +12,14 @@ public class AcceptWindow : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            Accept();
+        }
+    }
+
     public void Open(System.Action acceptAction, System.Action cancleAction)
     {
 

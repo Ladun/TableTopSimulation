@@ -34,6 +34,17 @@ public class CustomFileBrowser : MonoBehaviour
         SetPathToHome();
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            if (!UIManager.instance.acceptWindow.gameObject.activeSelf)
+            {
+                Selected();
+            }
+        }
+    }
+
     private void ValueClear()
     {
         _filter = null;

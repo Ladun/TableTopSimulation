@@ -20,11 +20,10 @@ public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         graphic.color = normalColor;
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public virtual void OnPointerClick(PointerEventData eventData)
     {
         if (onClick != null)
             onClick.Invoke(this);
-
     }
 
     public void OnPointerDown(PointerEventData eventData)

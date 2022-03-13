@@ -61,4 +61,9 @@ public class ContentManager : MonoBehaviour
         }
         _data.Clear();
     }
+
+    public CustomData GetActiveObject()
+    {
+        return _data[activeDataIdx];
+    }
 }
