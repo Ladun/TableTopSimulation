@@ -8347,7 +8347,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineWidth: 0.005
   mat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-  matColor: {r: 0.6179246, g: 1, b: 0.63896406, a: 1}
+  matColor: {r: 0.2793699, g: 0.6227846, b: 0.8113208, a: 1}
 --- !u!4 &1584440433
 Transform:
   m_ObjectHideFlags: 0

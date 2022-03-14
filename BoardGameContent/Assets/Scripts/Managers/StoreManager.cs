@@ -35,6 +35,8 @@ public class StoreManager : MonoBehaviour
         public string objName;
         public string name;
         public string[] textures;
+
+        public float sizeX, sizeY, sizeZ;
     }
 
     public void Save(string packageName, string packageVersion, string targetDir)
@@ -76,6 +78,10 @@ public class StoreManager : MonoBehaviour
                 byte[] _bytes = ((Texture2D)data.meshRenderers[j].material.mainTexture).EncodeToPNG();
                 SaveFile(Path.Combine(packageDir, d.textures[j]), _bytes);
             }
+            d.sizeX = data.colliderSize.x;
+            d.sizeY = data.colliderSize.y;
+            d.sizeZ = data.colliderSize.z;
+
             objData[i] = d;
         }
 
@@ -112,6 +118,7 @@ public class StoreManager : MonoBehaviour
             ObjData d = storeData.objData[i];
             CustomData cdata = ContentManager.instance.AddObj(Path.Combine(targetDir, d.objName));
             cdata.go.name = d.name;
+            cdata.colliderSize = new Vector3(d.sizeX, d.sizeY, d.sizeZ);
 
             for(int j = 0; j < d.textures.Length; j++)
             {

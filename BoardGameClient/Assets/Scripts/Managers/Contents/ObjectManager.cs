@@ -41,10 +41,6 @@ public class ObjectManager
         }
         else if(objectType == GameObjectType.TableObject)
         {
-            // TODO: 
-            // ObjectInfo의 PackageCode를 통해서 package를 찾고, Name을 통해서 해당 패키지 내부의 오브젝트를 찾음
-            // 해당 오브젝트를 ObjLoader를 이용해서 Load하고 이를 사용.
-            // 문제는 Collider를 어떻게 설정하냐는 것
 
             PackageManager.StoreData data;
             if(Managers.Instance.Package.packageDict.TryGetValue(info.PackageCode, out data))
@@ -70,8 +66,10 @@ public class ObjectManager
                     // TODO: Error check
                 }
 
-                go.AddComponent<MeshCollider>().sharedMesh = go.GetComponentInChildren<MeshFilter>().sharedMesh;
-                go.GetComponent<MeshCollider>().convex = true;
+                //go.AddComponent<MeshCollider>().sharedMesh = go.GetComponentInChildren<MeshFilter>().sharedMesh;
+                //go.GetComponent<MeshCollider>().convex = true;
+                BoxCollider bc = go.AddComponent<BoxCollider>();
+                bc.size = new Vector3(objData.sizeX, objData.sizeY, objData.sizeZ);
                 go.AddComponent<Rigidbody>();
                 go.AddComponent<Outline>();
                 TableObject to = go.AddComponent<TableObject>();

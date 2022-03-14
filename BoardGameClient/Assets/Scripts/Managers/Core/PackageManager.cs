@@ -28,6 +28,8 @@ public class PackageManager
         public string objName;
         public string name;
         public string[] textures;
+
+        public float sizeX, sizeY, sizeZ;
     }
     #endregion
 

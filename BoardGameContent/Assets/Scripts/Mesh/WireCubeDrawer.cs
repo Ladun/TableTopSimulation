@@ -43,6 +43,11 @@ public class WireCubeDrawer : MonoBehaviour
 
     public void SetSize(float x, float y, float z)
     {
+        x /= 2;
+        y /= 2;
+        z /= 2;
+
+
         SetPositions(0, new Vector3[]{
             new Vector3(x, y, -z),
             new Vector3(x, -y, -z),
