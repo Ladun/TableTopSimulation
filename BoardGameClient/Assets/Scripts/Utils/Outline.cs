@@ -86,6 +86,8 @@ public class Outline : MonoBehaviour
     private Renderer[] renderers;
     private Material outlineMaskMaterial;
     private Material outlineFillMaterial;
+    public Material OutlineMaskMat { get { return outlineMaskMaterial; } }
+    public Material OutlineFillMat { get { return outlineFillMaterial; } }
 
     private bool needsUpdate;
 
@@ -114,9 +116,9 @@ public class Outline : MonoBehaviour
         renderers = GetComponentsInChildren<Renderer>();
     }
 
+
     void OnEnable()
-    {
-        
+    {        
         foreach (var renderer in renderers)
         {
 
@@ -147,7 +149,7 @@ public class Outline : MonoBehaviour
         // Generate smooth normals when baking is enabled
         if (precomputeOutline && bakeKeys.Count == 0)
         {
-            Bake();
+            Bake(); 
         }
     }
 

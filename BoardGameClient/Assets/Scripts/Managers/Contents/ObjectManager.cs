@@ -66,8 +66,6 @@ public class ObjectManager
                     // TODO: Error check
                 }
 
-                //go.AddComponent<MeshCollider>().sharedMesh = go.GetComponentInChildren<MeshFilter>().sharedMesh;
-                //go.GetComponent<MeshCollider>().convex = true;
                 BoxCollider bc = go.AddComponent<BoxCollider>();
                 bc.size = new Vector3(objData.sizeX, objData.sizeY, objData.sizeZ);
                 go.AddComponent<Rigidbody>();

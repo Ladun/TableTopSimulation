@@ -113,10 +113,14 @@ public class StoreManager : MonoBehaviour
         byte[] bytes = LoadFile(jsonFilePath);
         StoreData storeData = JsonUtility.FromJson<StoreData>(Encoding.UTF8.GetString(bytes));
 
+        CustomContentBrowser _ccb = UIManager.instance.contentBrowser;
+
         for(int i = 0; i < storeData.objData.Length; i++)
         {
             ObjData d = storeData.objData[i];
-            CustomData cdata = ContentManager.instance.AddObj(Path.Combine(targetDir, d.objName));
+            _ccb.Add(Path.Combine(targetDir, d.objName));
+
+            CustomData cdata = _ccb.WrappedDatas[_ccb.WrappedDatas.Count - 1].data;
             cdata.go.name = d.name;
             cdata.colliderSize = new Vector3(d.sizeX, d.sizeY, d.sizeZ);
 

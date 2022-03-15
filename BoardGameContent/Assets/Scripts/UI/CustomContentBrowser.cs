@@ -40,6 +40,7 @@ public class CustomContentBrowser : MonoBehaviour
     public TMP_InputField packageVersion;
 
     private List<WrappedData> wrappedData = new List<WrappedData>();
+    public List<WrappedData> WrappedDatas { get { return wrappedData; } }
 
     public void UpdateBrowser()
     {
@@ -122,8 +123,11 @@ public class CustomContentBrowser : MonoBehaviour
             content.onClick = (CustomButton b) =>
             {
                 UIManager.instance.contentBrowser.ActiveData(idx);
-                if(!wrappedData[idx].IsDirectory)
+                if (!wrappedData[idx].IsDirectory)
+                {
                     ContentManager.instance.ActiveData(wrappedData[idx].dataIdx);
+                    UIManager.instance.colliderBrowser.Open();
+                }
             };
             _contents.Add(content);
         }

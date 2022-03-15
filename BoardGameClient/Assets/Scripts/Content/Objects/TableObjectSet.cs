@@ -2,6 +2,7 @@ using Google.Protobuf.Protocol;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class TableObjectSet : TableObject
 {
@@ -55,11 +56,11 @@ public class TableObjectSet : TableObject
     }
     public void Add(TableObjectSet otherSet)
     {
+        otherSet.FreeAllObject();
         foreach (TableObject to in  otherSet.containedObjects)
         {
             Add(to);
         }
-        otherSet.FreeAllObject();
         Managers.Instance.GetScene<GameScene>().SendDespawnObject(otherSet.Id);
     }
 
@@ -80,6 +81,12 @@ public class TableObjectSet : TableObject
 
         UpdateItemPosition();
         outline.UpdateRendererCache();
+
+        var renderer = to.GetComponentInChildren<Renderer>();
+        var materials = renderer.sharedMaterials.ToList();
+        materials.Remove(outline.OutlineMaskMat);
+        materials.Remove(outline.OutlineFillMat);
+        renderer.materials = materials.ToArray();
     }
 
     public void FreeAllObject()
@@ -96,11 +103,12 @@ public class TableObjectSet : TableObject
 
     private void UpdateItemPosition()
     {
+
         for (int i = 0; i < containedObjects.Count; i++)
         {
             containedObjects[i].GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
-        
+
         switch (sortType)
         {
             case SortType.Overlap:
@@ -108,11 +116,10 @@ public class TableObjectSet : TableObject
                     float y = 0;
                     for(int i = 0; i < containedObjects.Count; i++)
                     {
-                        // TODO: 현재는 Mesh Collider를 사용하고 있으므로 Mesh Collider용으로 바꾸거나, Mesh Collider가 아닌 Box Collider 사용하기
-                        float boundHeight = containedObjects[i].GetComponent<Collider>().bounds.size.y;
+                        float boundHeight = containedObjects[i].GetComponent<BoxCollider>().bounds.size.y;
                         y += boundHeight / 2;
 
-                        containedObjects[i].transform.localPosition = new Vector3(0, y, 0);
+                        containedObjects[i].transform.localPosition = new Vector3(0, y - Managers.Instance.GetScene<GameScene>().myPlayer.distanceFromTable, 0);
 
                         y += boundHeight / 2 + yDist;
                     }
@@ -159,11 +166,11 @@ public class TableObjectSet : TableObject
 
     private void PickEvent(ObjectEvent e, Player p)
     {
-        SelectEvent(new ObjectEvent()
-        {
-            ObjectEventId = TableObjectEventType.Select,
-            ObjectValue=0
-        }, p);
+        //SelectEvent(new ObjectEvent()
+        //{
+        //    ObjectEventId = TableObjectEventType.Select,
+        //    ObjectValue=0
+        //}, p);
         TableObject to = containedObjects[containedObjects.Count - 1];
 
         print(to.name);
