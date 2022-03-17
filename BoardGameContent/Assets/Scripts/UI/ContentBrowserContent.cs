@@ -26,7 +26,6 @@ public class ContentBrowserContent : CustomButton, IBeginDragHandler, IDragHandl
 
     private void Start()
     {
-        transform.GetChild(1).gameObject.SetActive(false);
         _parent = transform.parent;
         matTexture.GetComponent<Button>().onClick.AddListener(() =>
         {
@@ -51,11 +50,13 @@ public class ContentBrowserContent : CustomButton, IBeginDragHandler, IDragHandl
         offset = eventData.position - (Vector2)transform.position;
         transform.SetParent(transform.parent.parent);
         isDrag = true;
+        UIManager.instance.contentBrowser.OpenDragViewer();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         transform.position = eventData.position - offset;
+        UIManager.instance.contentBrowser.UpdateDragViewerPos(((Vector2)transform.parent.position - eventData.position).y);
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -63,11 +64,13 @@ public class ContentBrowserContent : CustomButton, IBeginDragHandler, IDragHandl
         transform.SetParent(_parent);
         UIManager.instance.contentBrowser.SetContentPosition(this, ((Vector2)transform.parent.position - eventData.position).y);
         isDrag = false;
+        UIManager.instance.contentBrowser.CloseDragViewer();
     }
 
 
     public void Setting(CustomContentBrowser.WrappedData wrappedData, int idx, System.Action<CustomButton> deleteAction)
     {
+        transform.GetChild(1).gameObject.SetActive(false);
         wd = wrappedData;
         contentIdx = idx;
 
